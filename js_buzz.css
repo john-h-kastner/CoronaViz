@@ -33,4 +33,42 @@ span.line {
   margin-right: 1em;
 }
 
+#progress {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    left: 35%;
+    top: 65%;
+    width: 50%;
+    height: 20px;
+    background-color: #fff;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 4px;
+    padding: 2px;
+}
 
+#progress-bar {
+    width: 0;
+    height: 100%;
+    background-color: #76A6FC;
+    border-radius: 4px;
+}
+
+#loader {
+  display: none;
+  border: 16px solid #A9A9A9; /* Dark grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  position: absolute;
+  z-index: 1000;
+  left: 35%;
+  top: 65%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
