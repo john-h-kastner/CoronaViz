@@ -28,10 +28,11 @@ $( function() {
       document.getElementById("display_start_date").valueAsDate = epochMinsToDate(displayStartMins);
       document.getElementById("display_end_date").valueAsDate = epochMinsToDate(displayEndMins);
 
-
       var subMarkerList = markersBetween(displayStartMins, displayEndMins);
       markers.clearLayers();
       markers.addLayers(subMarkerList);
+
+      document.getElementById("animate_window").value = "Custom";
     }
   });
 } );
@@ -42,13 +43,13 @@ var nodeList;
 var dataStartDate;
 var dataEndDate;
 
-var displayEndDate
-var displayEndDate
-
-   
 updateMap();
 
-//TODO: make this a binary search since that's definitly more efficient. To bad
+var animateWindow = 24 * 60;
+var animateStep = 60;
+   
+
+//TODO: make this a binary search since that's definitely more efficient. To bad
 // I'm too lazy to do it right the first time. Well, it seems to work as is,
 // so why do more work than I have to? Make this change if it's too slow.
 function nodeIndexOfTime(time) {
@@ -60,7 +61,6 @@ function nodeIndexOfTime(time) {
 function markersBetween(timeStart, timeEnd) {
     var iStart = nodeIndexOfTime(timeStart)
     var iEnd = nodeIndexOfTime(timeEnd)
-    console.log([iStart, iEnd]);
     return markerList.slice(iStart, iEnd);
 }
 
@@ -100,17 +100,14 @@ var animating = false;
 async function animateMarkers() {
   if (!animating) {
     animating = true;
-    var windowSize = 24*60;
-    var stepSize = 60;
-
-    for (var i = dateToEpochMins(dataStartDate); animating && i < dateToEpochMins(dataEndDate) - windowSize; i+=stepSize) {
-      var subMarkerList = markersBetween(i, i+windowSize);
+    for (var i = dateToEpochMins(dataStartDate); animating && i < dateToEpochMins(dataEndDate) - animateWindow; i+=animateStep) {
+      var subMarkerList = markersBetween(i, i+animateWindow);
       markers.clearLayers();
       markers.addLayers(subMarkerList);
 
       document.getElementById("display_start_date").valueAsDate = epochMinsToDate(i)
-      document.getElementById("display_end_date").valueAsDate = epochMinsToDate(i+windowSize);
-      $("#slider-range").slider("values", [i, i+windowSize]);
+      document.getElementById("display_end_date").valueAsDate = epochMinsToDate(i+animateWindow);
+      $("#slider-range").slider("values", [i, i+animateWindow]);
 
       await new Promise(r => setTimeout(r, 100));
     }
@@ -213,4 +210,24 @@ function updateProgressBar(processed, total, elapsed, layersArray) {
         // all markers processed - hide the progress bar:
         progress.style.display = 'none';
     }
+}
+
+function setAnimateWindow(size) {
+    animateWindow = parseInt(size);
+    console.log(animateWindow);
+
+    var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
+    var endDate = startDate + animateWindow;
+    console.log([startDate, endDate]);
+
+    document.getElementById("display_end_date").valueAsDate = epochMinsToDate(endDate);
+    $("#slider-range").slider("values", [startDate, endDate]);
+
+    var subMarkerList = markersBetween(startDate, endDate);
+    markers.clearLayers();
+    markers.addLayers(subMarkerList);
+}
+
+function setAnimateSpeed(speed) {
+    animateStep = parseInt(speed);
 }
