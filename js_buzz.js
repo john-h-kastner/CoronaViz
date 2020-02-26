@@ -33,6 +33,7 @@ $( function() {
       markers.addLayers(subMarkerList);
 
       document.getElementById("animate_window").value = "Custom";
+      animateWindow = displayEndMins - displayStartMins;
     }
   });
 } );
@@ -45,8 +46,8 @@ var dataEndDate;
 
 updateMap();
 
-var animateWindow = 24 * 60;
-var animateStep = 60;
+var animateWindow = 7 * 24 * 60;
+var animateStep = 24 * 60;
    
 
 //TODO: make this a binary search since that's definitely more efficient. To bad
@@ -214,11 +215,9 @@ function updateProgressBar(processed, total, elapsed, layersArray) {
 
 function setAnimateWindow(size) {
     animateWindow = parseInt(size);
-    console.log(animateWindow);
 
     var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
     var endDate = startDate + animateWindow;
-    console.log([startDate, endDate]);
 
     document.getElementById("display_end_date").valueAsDate = epochMinsToDate(endDate);
     $("#slider-range").slider("values", [startDate, endDate]);
