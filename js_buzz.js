@@ -1,7 +1,14 @@
 var map = L.map('map', {'worldCopyJump': true}).setView([0,0], 2);
 
-var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+
+var attribution = 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                  '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a> | ' +
+                  'Imagery &copy; <a href="https://www.mapbox.com/">Mapbox</a>';
+
+L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiamFja2FzdG5lciIsImEiOiJjamx2bzhmc2YweTAxM2xxcGtqcHJtN3pkIn0.YKUh0QLQT_GHHVMdAyS-Mg',{
+    attribution: attribution,
+    maxZoom: 20,
+    id: 'mapbox.streets',
 }).addTo(map);
 
 var markers = L.markerClusterGroup({
@@ -11,6 +18,10 @@ var markers = L.markerClusterGroup({
         var childCount = cluster.getAllChildMarkers().reduce((a,v) => a + v.count, 0)
         return markerIcon(childCount);
     }
+});
+markers.on('spiderfied', function (a) {
+    var allArticles = a.markers.flatMap( function (m) {return m.articles});
+    L.popup({maxHeight: 200}).setLatLng(a.cluster.getLatLng()).setContent(makePopupHtml(allArticles, a.markers[0].name)).openOn(map);
 });
 
 
@@ -70,7 +81,11 @@ function setMarkers(nodes) {
   nodeList = nodes;
   markerList = nodeList.map(function (p) {
       var marker = new L.Marker(L.latLng(p.lat, p.lng), { icon: markerIcon(p.count)});
+      var articles = JSON.parse(p.articles);
+      marker.bindPopup(makePopupHtml(articles, p.name),{maxHeight: 100});
       marker.count = p.count;
+      marker.name = p.name;
+      marker.articles = articles;
       return marker;
   });
   markers.addLayers(markerList);
@@ -92,6 +107,13 @@ function setMarkers(nodes) {
 
     $("#slider-range").slider("option", "values", [min, max]);
   }
+}
+
+function makePopupHtml(articles, name) {
+  var articles_html = articles.map(function(e) {
+    return "<li><a href=" + e.url +">" + e.title + "</a></li>";
+  }).join("");
+  return "<em>"+name+"</em><br><ol>"+articles_html+"</ol>";
 }
 
 // 99% sure this isn't the correct way to do this, but I can't be bothered to
