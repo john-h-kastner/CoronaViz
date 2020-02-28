@@ -1,9 +1,9 @@
 FILES = index.html js_buzz.js js_buzz.css
-BUCKET = corona
+BUCKETS = corona coronaviz
 
 deploy: .deploy
 .deploy: $(FILES)
-	cpobj $(FILES) $(BUCKET):
+	$(foreach BUCKET, $(BUCKETS), cpobj $(FILES) $(BUCKET): ;)
 	@touch $@
 
 clean:
