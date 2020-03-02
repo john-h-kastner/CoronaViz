@@ -151,6 +151,8 @@ function markerIcon(clusterSize) {
     'border-radius: 50%;' +
     'width: '  + size + 'px;' + 
     'height: ' + size + 'px;' +
+    'line-height: ' + size + 'px;' +
+    'font-weight: bold;' +
     'background-color: ' + color + ';';
 
   return new L.DivIcon({ html: '<div style="' + elemStyle + '">' + clusterSize + '</div>', className: 'marker-cluster', iconSize: new L.Point(size, size) });
