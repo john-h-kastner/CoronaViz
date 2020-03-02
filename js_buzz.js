@@ -59,6 +59,7 @@ updateMap();
 
 var animateWindow = 7 * 24 * 60;
 var animateStep = 24 * 60;
+var animateSpeed = 100;
    
 
 //TODO: make this a binary search since that's definitely more efficient. To bad
@@ -132,7 +133,7 @@ async function animateMarkers() {
       document.getElementById("display_end_date").valueAsDate = epochMinsToDate(i+animateWindow);
       $("#slider-range").slider("values", [i, i+animateWindow]);
 
-      await new Promise(r => setTimeout(r, 100));
+      await new Promise(r => setTimeout(r, animateSpeed));
     }
   } 
   terminateAnimation();
@@ -251,6 +252,10 @@ function setAnimateWindow(size) {
     markers.addLayers(subMarkerList);
 }
 
+function setAnimateStep(step) {
+    animateStep = parseInt(step);
+}
+
 function setAnimateSpeed(speed) {
-    animateStep = parseInt(speed);
+    animateSpeed = parseInt(speed);
 }

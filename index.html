@@ -79,14 +79,24 @@
 </span>
 
 <span class="line">
-<label for="animate_speed">Animation Step:</label>
-<select id="animate_speed" onchange="setAnimateSpeed(this.value)">
+<label for="animate_step">Animation Step:</label>
+<select id="animate_step" onchange="setAnimateStep(this.value)">
   <option value="60">Hour</option>
   <option value="1140" selected>Day</option>
   <option value="10080">Week</option>
   <option value="43200">Month</option>
 </select>
 </span>
+
+<span class="line">
+<label for="animate_speed">Animation Speed:</label>
+<select id="animate_speed" onchange="setAnimateSpeed(this.value)">
+  <option value="0">Fast</option>
+  <option value="100" selected>Normal</option>
+  <option value="500">Slow</option>
+</select>
+</span>
+
 
 <br>
 
