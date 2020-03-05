@@ -83,6 +83,9 @@ function setMarkers(nodes) {
   markerList = nodeList.map(function (p) {
       var marker = new L.Marker(L.latLng(p.lat, p.lng), { icon: markerIcon(p.count)});
       var articles = JSON.parse(p.articles);
+      articles = articles.map(function (a) {
+          return {title: a['f1'], url: a['f2']};
+      });
       marker.bindPopup(makePopupHtml(articles, p.name),{maxHeight: 100});
       marker.count = p.count;
       marker.name = p.name;
