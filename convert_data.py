@@ -22,7 +22,7 @@ def convert_row(row_dict):
       cases = int(cases_str)
       if cases > 0:
         date = parse(date_str)
-        epoch_seconds = date.timestamp() / 1000;
+        epoch_seconds = date.timestamp() / 60;
         time_series_list.append({'time': epoch_seconds, 'cases': cases})
 
   if time_series_list:
@@ -49,5 +49,3 @@ for name in data_file_names:
             row_list.append(converted_row)
     with open(json_data_dir + name + '.json', 'w') as json_file:
       json.dump(row_list, json_file);
-
-
