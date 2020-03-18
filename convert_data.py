@@ -1,7 +1,9 @@
 #! /usr/bin/env python
 
+import sys
 import json
 import csv
+import argparse
 from dateutil.parser import parse
 
 def convert_row(row_dict):
@@ -33,19 +35,18 @@ def convert_row(row_dict):
   else:
       return None
 
-json_data_dir = './webpage/'
-csv_data_dir = './COVID-19/csse_covid_19_data/csse_covid_19_time_series/'
-data_file_names = [ 'time_series_19-covid-Confirmed',
-                    'time_series_19-covid-Deaths',
-                    'time_series_19-covid-Recovered']
+parser = argparse.ArgumentParser()
+parser.add_argument('CSV_FILE', help='Input CSV file')
+parser.add_argument('JSON_FILE', help='Output JSON file')
+args = parser.parse_args()
 
-for name in data_file_names:
-    row_list = []
-    with open(csv_data_dir + name + '.csv', 'r') as csv_file:
-      reader = csv.DictReader(csv_file)
-      for row in reader:
-          converted_row = convert_row(row)
-          if converted_row:
-            row_list.append(converted_row)
-    with open(json_data_dir + name + '.json', 'w') as json_file:
-      json.dump(row_list, json_file);
+name = sys.argv[1]
+row_list = []
+with open(args.CSV_FILE, 'r') as csv_file:
+  reader = csv.DictReader(csv_file)
+  for row in reader:
+      converted_row = convert_row(row)
+      if converted_row:
+        row_list.append(converted_row)
+with open(args.JSON_FILE, 'w') as json_file:
+  json.dump(row_list, json_file);
