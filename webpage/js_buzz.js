@@ -24,6 +24,16 @@ markers.on('spiderfied', function (a) {
     L.popup({maxHeight: 200}).setLatLng(a.cluster.getLatLng()).setContent(makePopupHtml(allArticles, a.markers[0].name)).openOn(map);
 });
 
+var casesMarkers = L.markerClusterGroup({
+    chunkedLoading: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: false,
+    chunkProgress: updateProgressBar,
+    iconCreateFunction: function(cluster) {
+        var childCount = cluster.getAllChildMarkers().reduce((a,v) => a + v.count, 0)
+        return casesIcon(childCount);
+    }
+});
 
 $( function() {
   $( "#slider-range" ).slider({
@@ -60,7 +70,7 @@ updateMap();
 var animateWindow = 7 * 24 * 60;
 var animateStep = 24 * 60;
 var animateSpeed = 100;
-   
+
 
 //TODO: make this a binary search since that's definitely more efficient. To bad
 // I'm too lazy to do it right the first time. Well, it seems to work as is,
@@ -133,15 +143,17 @@ async function animateMarkers() {
       markers.clearLayers();
       markers.addLayers(subMarkerList);
 
+      plotCaseData(i + animateStep/2);
+
       document.getElementById("display_start_date").valueAsDate = epochMinsToDate(i)
       document.getElementById("display_end_date").valueAsDate = epochMinsToDate(i+animateWindow);
       $("#slider-range").slider("values", [i, i+animateWindow]);
 
       await new Promise(r => setTimeout(r, animateSpeed));
     }
-  } 
+  }
   terminateAnimation();
-} 
+}
 
 // Since I'm doing a bit of a hack here, the least I can do is hide it in function.
 function terminateAnimation() {
@@ -155,7 +167,7 @@ function markerIcon(clusterSize) {
 
   var elemStyle =
     'border-radius: 50%;' +
-    'width: '  + size + 'px;' + 
+    'width: '  + size + 'px;' +
     'height: ' + size + 'px;' +
     'line-height: ' + size + 'px;' +
     'font-weight: bold;' +
@@ -190,7 +202,7 @@ function constructQueryURL() {
 
   var url = "https://newsstand.umiacs.umd.edu/news/disease_time_query" +
         "?keyword=" + keyword +
-        "&start_date=" + start_epoch_mins + 
+        "&start_date=" + start_epoch_mins +
         "&end_date=" + end_epoch_mins;
 
   return url;
@@ -226,6 +238,43 @@ function updateMap() {
     xhr.send(null);
 }
 
+function plotCaseData(time) {
+    casesMarkerList = confirmed_cases.map(function (p) {
+        var count = findClosestCount(time, p.time_series);
+        var icon = casesIcon(count);
+        var marker = L.marker([p.lat, p.lng], {icon: icon});
+        marker.count = count;
+        return marker;
+    });
+    casesMarkers.clearLayers();
+    casesMarkers.addLayers(casesMarkerList);
+    map.addLayer(casesMarkers);
+}
+
+function findClosestCount(time, time_series) {
+    var i;
+    for(i = 0; i<time_series.length; i++){
+        if(time_series[i].time - time < (24*60)) {
+            return time_series.count;
+        }
+    }
+    return 0;
+}
+
+function casesIcon(numCases) {
+    var size = markerSize(numCases);
+    var color = markerColor(numCases);
+
+    var elemStyle =
+      'border-radius: 50%;' +
+      'width: '  + size + 'px;' +
+      'height: ' + size + 'px;' +
+      'line-height: ' + size + 'px;' +
+      'font-weight: bold;' +
+      'border: dashed red;';
+
+    return new L.DivIcon({ html: '<div style="' + elemStyle + '">' + numCases + '</div>', className: 'marker-cluster', iconSize: new L.Point(size, size) });
+}
 
 function updateProgressBar(processed, total, elapsed, layersArray) {
     var progress = document.getElementById('progress');
