@@ -126,7 +126,7 @@ function makePopupHtml(articles, name) {
 var animating = false;
 async function animateMarkers() {
   if (!animating) {
-    document.getElementById("animate").value = 'Stop Animation';
+    document.getElementById("animate").innerHTML = 'Stop Animation';
     animating = true;
     for (var i = dateToEpochMins(dataStartDate); animating && i < dateToEpochMins(dataEndDate) - animateWindow; i+=animateStep) {
       var subMarkerList = markersBetween(i, i+animateWindow);
@@ -146,7 +146,7 @@ async function animateMarkers() {
 // Since I'm doing a bit of a hack here, the least I can do is hide it in function.
 function terminateAnimation() {
     animating = false;
-    document.getElementById("animate").value = 'Start Animation';
+    document.getElementById("animate").innerHTML = 'Start Animation &raquo;';
 }
 
 function markerIcon(clusterSize) {
