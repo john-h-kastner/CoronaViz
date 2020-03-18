@@ -39,8 +39,8 @@ span.line {
     display: none;
     position: absolute;
     z-index: 1000;
-    left: 35%;
-    top: 65%;
+    left: 20%;
+    top: 45%;
     width: 50%;
     height: 20px;
     background-color: #fff;
@@ -63,10 +63,10 @@ span.line {
   border-radius: 50%;
   position: absolute;
   z-index: 1000;
-  left: 35%;
-  top: 65%;
-  width: 120px;
-  height: 120px;
+  left: 45%;
+  top: 45%;
+  width: 10vh;
+  height: 10vh;
   animation: spin 2s linear infinite;
 }
 
