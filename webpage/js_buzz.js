@@ -24,6 +24,17 @@ markers.on('spiderfied', function (a) {
     L.popup({maxHeight: 200}).setLatLng(a.cluster.getLatLng()).setContent(makePopupHtml(allArticles, a.markers[0].name)).openOn(map);
 });
 
+var casesMarkers = L.markerClusterGroup({
+    chunkedLoading: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: false,
+    chunkProgress: updateProgressBar,
+    iconCreateFunction: function(cluster) {
+        var childCount = cluster.getAllChildMarkers().reduce((a,v) => a + v.count, 0)
+        return casesIcon(childCount);
+    }
+});
+map.addLayer(casesMarkers);
 
 $( function() {
   $( "#slider-range" ).slider({
@@ -39,9 +50,15 @@ $( function() {
       document.getElementById("display_start_date").valueAsDate = epochMinsToDate(displayStartMins);
       document.getElementById("display_end_date").valueAsDate = epochMinsToDate(displayEndMins);
 
-      var subMarkerList = markersBetween(displayStartMins, displayEndMins);
-      markers.clearLayers();
-      markers.addLayers(subMarkerList);
+      if(newsDataSelected){
+        var subMarkerList = markersBetween(displayStartMins, displayEndMins);
+        markers.clearLayers();
+        markers.addLayers(subMarkerList);
+      }
+
+      if(confirmedCasesSelected){
+        plotCaseData(displayStartMins, displayEndMins);
+      }
 
       document.getElementById("animate_window").value = "Custom";
       animateWindow = displayEndMins - displayStartMins;
@@ -60,20 +77,55 @@ updateMap();
 var animateWindow = 7 * 24 * 60;
 var animateStep = 24 * 60;
 var animateSpeed = 100;
-   
+
+
+var newsDataSelected = document.getElementById("news_data_checkbox").checked;
+var confirmedCasesSelected = document.getElementById("confirmed_cases_checkbox").checked;
+
+function toggleNewsData() {
+    newsDataSelected = ! newsDataSelected;
+
+    if(newsDataSelected){
+        var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
+        var endDate = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
+        var subMarkerList = markersBetween(startDate, endDate);
+        markers.clearLayers();
+        markers.addLayers(subMarkerList);
+    } else {
+        markers.clearLayers();
+    }
+}
+
+
+function toggleConfirmedCases() {
+    confirmedCasesSelected = ! confirmedCasesSelected;
+    if(confirmedCasesSelected) {
+        var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
+        var endDate = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
+        plotCaseData(startDate, endDate);
+    } else {
+        casesMarkers.clearLayers();
+    }
+}
+
 
 //TODO: make this a binary search since that's definitely more efficient. To bad
 // I'm too lazy to do it right the first time. Well, it seems to work as is,
 // so why do more work than I have to? Make this change if it's too slow.
-function nodeIndexOfTime(time) {
-    return nodeList.findIndex(function (e) {
+function nodeIndexOfTime(list, time) {
+    var index = list.findIndex(function (e) {
         return e.time >= time;
     });
+    if (index == -1) {
+        return list.length - 1;
+    } else {
+        return index;
+    }
 }
 
 function markersBetween(timeStart, timeEnd) {
-    var iStart = nodeIndexOfTime(timeStart)
-    var iEnd = nodeIndexOfTime(timeEnd)
+    var iStart = nodeIndexOfTime(nodeList, timeStart)
+    var iEnd = nodeIndexOfTime(nodeList, timeEnd)
     return markerList.slice(iStart, iEnd);
 }
 
@@ -92,7 +144,9 @@ function setMarkers(nodes) {
       marker.articles = articles;
       return marker;
   });
-  markers.addLayers(markerList);
+  if(newsDataSelected){
+    markers.addLayers(markerList);
+  }
   map.addLayer(markers);
 
   if(nodeList.length > 0) {
@@ -110,6 +164,10 @@ function setMarkers(nodes) {
     $("#slider-range").slider("option", "max", max);
 
     $("#slider-range").slider("option", "values", [min, max]);
+
+    if(confirmedCasesSelected){
+      plotCaseData(min, max);
+    }
   }
 }
 
@@ -129,9 +187,17 @@ async function animateMarkers() {
     document.getElementById("animate").innerHTML = 'Stop Animation';
     animating = true;
     for (var i = dateToEpochMins(dataStartDate); animating && i < dateToEpochMins(dataEndDate) - animateWindow; i+=animateStep) {
-      var subMarkerList = markersBetween(i, i+animateWindow);
-      markers.clearLayers();
-      markers.addLayers(subMarkerList);
+
+
+      if(newsDataSelected){
+        var subMarkerList = markersBetween(i, i+animateWindow);
+        markers.clearLayers();
+        markers.addLayers(subMarkerList);
+      }
+
+      if(confirmedCasesSelected){
+        plotCaseData(min, max);
+      }
 
       document.getElementById("display_start_date").valueAsDate = epochMinsToDate(i)
       document.getElementById("display_end_date").valueAsDate = epochMinsToDate(i+animateWindow);
@@ -139,9 +205,9 @@ async function animateMarkers() {
 
       await new Promise(r => setTimeout(r, animateSpeed));
     }
-  } 
+  }
   terminateAnimation();
-} 
+}
 
 // Since I'm doing a bit of a hack here, the least I can do is hide it in function.
 function terminateAnimation() {
@@ -155,7 +221,7 @@ function markerIcon(clusterSize) {
 
   var elemStyle =
     'border-radius: 50%;' +
-    'width: '  + size + 'px;' + 
+    'width: '  + size + 'px;' +
     'height: ' + size + 'px;' +
     'line-height: ' + size + 'px;' +
     'font-weight: bold;' +
@@ -190,7 +256,7 @@ function constructQueryURL() {
 
   var url = "https://newsstand.umiacs.umd.edu/news/disease_time_query" +
         "?keyword=" + keyword +
-        "&start_date=" + start_epoch_mins + 
+        "&start_date=" + start_epoch_mins +
         "&end_date=" + end_epoch_mins;
 
   return url;
@@ -226,6 +292,39 @@ function updateMap() {
     xhr.send(null);
 }
 
+function plotCaseData(timeStart, timeEnd) {
+    casesMarkerList = timeSeriesConfirmed.map(function (p) {
+        var indexStart = nodeIndexOfTime(p.time_series, timeStart);
+        var indexEnd = nodeIndexOfTime(p.time_series, timeEnd);
+        var count =  p.time_series[indexEnd].cases - p.time_series[indexStart].cases;
+
+        var icon = casesIcon(count);
+        var marker = L.marker([p.lat, p.lng], {icon: icon});
+        marker.count = count;
+        return marker;
+    });
+    casesMarkers.clearLayers();
+    casesMarkers.addLayers(casesMarkerList);
+}
+
+function casesIcon(numCases) {
+    var size = markerSize(numCases) / 2;
+    var color = markerColor(numCases);
+
+    var elemStyle =
+      'border-radius: 50%;' +
+      'width: '  + size + 'px;' +
+      'height: ' + size + 'px;' +
+      'line-height: ' + size + 'px;' +
+      'font-weight: bold;' +
+      'border: dashed red;';
+
+    if (numCases == 0) {
+        elemStyle += 'display: none;';
+    }
+
+    return new L.DivIcon({ html: '<div style="' + elemStyle + '">' + numCases + '</div>', className: 'marker-cluster', iconSize: new L.Point(size, size) });
+}
 
 function updateProgressBar(processed, total, elapsed, layersArray) {
     var progress = document.getElementById('progress');
@@ -252,9 +351,15 @@ function setAnimateWindow(size) {
     document.getElementById("display_end_date").valueAsDate = epochMinsToDate(endDate);
     $("#slider-range").slider("values", [startDate, endDate]);
 
-    var subMarkerList = markersBetween(startDate, endDate);
-    markers.clearLayers();
-    markers.addLayers(subMarkerList);
+    if (newDataSelected) {
+      var subMarkerList = markersBetween(startDate, endDate);
+      markers.clearLayers();
+      markers.addLayers(subMarkerList);
+    }
+
+    if(confirmedCasesSelected){
+      plotCaseData(startDate, endDate);
+    }
 }
 
 function setAnimateStep(step) {
