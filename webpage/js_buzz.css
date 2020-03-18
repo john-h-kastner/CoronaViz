@@ -72,3 +72,22 @@ span.line {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.circle {
+  width: 1em;
+  height: 1em;
+  line-height: 1.2em;
+  border-radius: 50%;
+  text-align: center;
+  border: 2px solid #666;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.circle:link {
+  border-color: blue;
+}
+
+.circle:visited {
+  border-color: purple;
+}

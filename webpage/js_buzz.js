@@ -24,6 +24,16 @@ markers.on('spiderfied', function (a) {
     L.popup({maxHeight: 200}).setLatLng(a.cluster.getLatLng()).setContent(makePopupHtml(allArticles, a.markers[0].name)).openOn(map);
 });
 
+var casesMarkers = L.markerClusterGroup({
+    chunkedLoading: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: false,
+    chunkProgress: updateProgressBar,
+    iconCreateFunction: function(cluster) {
+        var childCount = cluster.getAllChildMarkers().reduce((a,v) => a + v.count, 0)
+        return casesIcon(childCount);
+    }
+});
 
 $( function() {
   $( "#slider-range" ).slider({
@@ -133,6 +143,8 @@ async function animateMarkers() {
       markers.clearLayers();
       markers.addLayers(subMarkerList);
 
+      plotCaseData(i + animateStep/2);
+
       document.getElementById("display_start_date").valueAsDate = epochMinsToDate(i)
       document.getElementById("display_end_date").valueAsDate = epochMinsToDate(i+animateWindow);
       $("#slider-range").slider("values", [i, i+animateWindow]);
@@ -226,6 +238,43 @@ function updateMap() {
     xhr.send(null);
 }
 
+function plotCaseData(time) {
+    casesMarkerList = confirmed_cases.map(function (p) {
+        var count = findClosestCount(time, p.time_series);
+        var icon = casesIcon(count);
+        var marker = L.marker([p.lat, p.lng], {icon: icon});
+        marker.count = count;
+        return marker;
+    });
+    casesMarkers.clearLayers();
+    casesMarkers.addLayers(casesMarkerList);
+    map.addLayer(casesMarkers);
+}
+
+function findClosestCount(time, time_series) {
+    var i;
+    for(i = 0; i<time_series.length; i++){
+        if(time_series[i].time - time < (24*60)) {
+            return time_series.count;
+        }
+    }
+    return 0;
+}
+
+function casesIcon(numCases) {
+    var size = markerSize(numCases);
+    var color = markerColor(numCases);
+
+    var elemStyle =
+      'border-radius: 50%;' +
+      'width: '  + size + 'px;' + 
+      'height: ' + size + 'px;' +
+      'line-height: ' + size + 'px;' +
+      'font-weight: bold;' +
+      'border: dashed red;';
+
+    return new L.DivIcon({ html: '<div style="' + elemStyle + '">' + numCases + '</div>', className: 'marker-cluster', iconSize: new L.Point(size, size) });
+}
 
 function updateProgressBar(processed, total, elapsed, layersArray) {
     var progress = document.getElementById('progress');
