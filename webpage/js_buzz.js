@@ -34,6 +34,7 @@ var casesMarkers = L.markerClusterGroup({
         return casesIcon(childCount);
     }
 });
+map.addLayer(casesMarkers);
 
 $( function() {
   $( "#slider-range" ).slider({
@@ -49,11 +50,15 @@ $( function() {
       document.getElementById("display_start_date").valueAsDate = epochMinsToDate(displayStartMins);
       document.getElementById("display_end_date").valueAsDate = epochMinsToDate(displayEndMins);
 
-      var subMarkerList = markersBetween(displayStartMins, displayEndMins);
-      markers.clearLayers();
-      markers.addLayers(subMarkerList);
+      if(newsDataSelected){
+        var subMarkerList = markersBetween(displayStartMins, displayEndMins);
+        markers.clearLayers();
+        markers.addLayers(subMarkerList);
+      }
 
-      plotCaseData(displayStartMins, displayEndMins);
+      if(confirmedCasesSelected){
+        plotCaseData(displayStartMins, displayEndMins);
+      }
 
       document.getElementById("animate_window").value = "Custom";
       animateWindow = displayEndMins - displayStartMins;
@@ -72,6 +77,36 @@ updateMap();
 var animateWindow = 7 * 24 * 60;
 var animateStep = 24 * 60;
 var animateSpeed = 100;
+
+
+var newsDataSelected = document.getElementById("news_data_checkbox").checked;
+var confirmedCasesSelected = document.getElementById("confirmed_cases_checkbox").checked;
+
+function toggleNewsData() {
+    newsDataSelected = ! newsDataSelected;
+
+    if(newsDataSelected){
+        var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
+        var endDate = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
+        var subMarkerList = markersBetween(startDate, endDate);
+        markers.clearLayers();
+        markers.addLayers(subMarkerList);
+    } else {
+        markers.clearLayers();
+    }
+}
+
+
+function toggleConfirmedCases() {
+    confirmedCasesSelected = ! confirmedCasesSelected;
+    if(confirmedCasesSelected) {
+        var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
+        var endDate = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
+        plotCaseData(startDate, endDate);
+    } else {
+        casesMarkers.clearLayers();
+    }
+}
 
 
 //TODO: make this a binary search since that's definitely more efficient. To bad
@@ -109,7 +144,9 @@ function setMarkers(nodes) {
       marker.articles = articles;
       return marker;
   });
-  markers.addLayers(markerList);
+  if(newsDataSelected){
+    markers.addLayers(markerList);
+  }
   map.addLayer(markers);
 
   if(nodeList.length > 0) {
@@ -128,7 +165,9 @@ function setMarkers(nodes) {
 
     $("#slider-range").slider("option", "values", [min, max]);
 
-    plotCaseData(min, max);
+    if(confirmedCasesSelected){
+      plotCaseData(min, max);
+    }
   }
 }
 
@@ -148,11 +187,17 @@ async function animateMarkers() {
     document.getElementById("animate").innerHTML = 'Stop Animation';
     animating = true;
     for (var i = dateToEpochMins(dataStartDate); animating && i < dateToEpochMins(dataEndDate) - animateWindow; i+=animateStep) {
-      var subMarkerList = markersBetween(i, i+animateWindow);
-      markers.clearLayers();
-      markers.addLayers(subMarkerList);
 
-      plotCaseData(i, i + animateStep);
+
+      if(newsDataSelected){
+        var subMarkerList = markersBetween(i, i+animateWindow);
+        markers.clearLayers();
+        markers.addLayers(subMarkerList);
+      }
+
+      if(confirmedCasesSelected){
+        plotCaseData(min, max);
+      }
 
       document.getElementById("display_start_date").valueAsDate = epochMinsToDate(i)
       document.getElementById("display_end_date").valueAsDate = epochMinsToDate(i+animateWindow);
@@ -260,21 +305,10 @@ function plotCaseData(timeStart, timeEnd) {
     });
     casesMarkers.clearLayers();
     casesMarkers.addLayers(casesMarkerList);
-    map.addLayer(casesMarkers);
-}
-
-function findClosestCount(time, time_series) {
-    var i;
-    for(i = 0; i<time_series.length; i++){
-        if(Math.abs(time_series[i].time - time) < (24*60)) {
-            return time_series[i].cases;
-        }
-    }
-    return 0;
 }
 
 function casesIcon(numCases) {
-    var size = markerSize(numCases);
+    var size = markerSize(numCases) / 2;
     var color = markerColor(numCases);
 
     var elemStyle =
@@ -317,9 +351,15 @@ function setAnimateWindow(size) {
     document.getElementById("display_end_date").valueAsDate = epochMinsToDate(endDate);
     $("#slider-range").slider("values", [startDate, endDate]);
 
-    var subMarkerList = markersBetween(startDate, endDate);
-    markers.clearLayers();
-    markers.addLayers(subMarkerList);
+    if (newDataSelected) {
+      var subMarkerList = markersBetween(startDate, endDate);
+      markers.clearLayers();
+      markers.addLayers(subMarkerList);
+    }
+
+    if(confirmedCasesSelected){
+      plotCaseData(startDate, endDate);
+    }
 }
 
 function setAnimateStep(step) {

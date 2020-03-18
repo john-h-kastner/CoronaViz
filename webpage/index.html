@@ -83,7 +83,7 @@
    </div>
 
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-4">
         <h2>Download Controls</h2>
 
         <span class="line">
@@ -107,7 +107,7 @@
         <span class="btn btn-secondary" id="update" onclick="updateMap();">Download Data &raquo;</span>
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-4">
         <h2>Animation Controls</h2>
         
         <span class="line">
@@ -144,6 +144,16 @@
 
         <br>
         <span class="btn btn-secondary" id="animate" onclick="animateMarkers();">Start Animation &raquo;</span>
+      </div>
+
+      <div class="col-md-4">
+        <h2> Layer Controls </h2>
+        <label for="news_data_checkbox">News Keyword Data: </label>
+        <input type="checkbox" id="news_data_checkbox" checked onclick="toggleNewsData();">
+        <br>
+
+        <label for="confirmed_cases_checkbox">Confirmed Cases: </label>
+        <input type="checkbox" id="confirmed_cases_checkbox" onclick="toggleConfirmedCases();">
       </div>
     </div>
 

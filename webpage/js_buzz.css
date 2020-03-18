@@ -20,7 +20,7 @@ html, body {
 }
 
 #map {
-  height: 50vh;
+  height: 75vh;
   width: 100vw;
   max-width: 100%;
 }
