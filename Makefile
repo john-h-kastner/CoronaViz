@@ -1,3 +1,5 @@
+all: deploy
+
 BUCKETS = corona coronaviz
 
 WEBPAGE_DIR = webpage
@@ -7,10 +9,14 @@ WEBPAGE_SRC_FILES = $(addprefix $(WEBPAGE_DIR)/,$(WEBPAGE_BASENAMES))
 JHU_DATA_DIR = COVID-19/csse_covid_19_data/csse_covid_19_time_series
 DATA_TYPES = Confirmed Recovered Deaths
 DATA_NAMES = $(addprefix time_series_19-covid-,$(DATA_TYPES))
-JSON_FILES = $(addprefix $(WEBPAGE_DIR)/,$(addsuffix .json,$(DATA_NAMES)))
+JSON_FILES = $(addprefix $(WEBPAGE_DIR)/,$(addsuffix .js,$(DATA_NAMES)))
 
-$(WEBPAGE_DIR)/%.json: $(JHU_DATA_DIR)/%.csv convert_data.py 
-	python convert_data.py $< $@
+define JS_template =
+$(WEBPAGE_DIR)/time_series_19-covid-$(1).js: $(JHU_DATA_DIR)/time_series_19-covid-$(1).csv convert_data.py
+	python convert_data.py $$< $$@ timeSeries$(1)
+endef
+
+$(foreach type,$(DATA_TYPES),$(eval $(call JS_template,$(type))))
 
 deploy: .deploy
 .deploy: $(JSON_FILES) $(WEBPAGE_SRC_FILES)

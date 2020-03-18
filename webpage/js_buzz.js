@@ -53,6 +53,8 @@ $( function() {
       markers.clearLayers();
       markers.addLayers(subMarkerList);
 
+      plotCaseData(displayStartMins, displayEndMins);
+
       document.getElementById("animate_window").value = "Custom";
       animateWindow = displayEndMins - displayStartMins;
     }
@@ -75,15 +77,20 @@ var animateSpeed = 100;
 //TODO: make this a binary search since that's definitely more efficient. To bad
 // I'm too lazy to do it right the first time. Well, it seems to work as is,
 // so why do more work than I have to? Make this change if it's too slow.
-function nodeIndexOfTime(time) {
-    return nodeList.findIndex(function (e) {
+function nodeIndexOfTime(list, time) {
+    var index = list.findIndex(function (e) {
         return e.time >= time;
     });
+    if (index == -1) {
+        return list.length - 1;
+    } else {
+        return index;
+    }
 }
 
 function markersBetween(timeStart, timeEnd) {
-    var iStart = nodeIndexOfTime(timeStart)
-    var iEnd = nodeIndexOfTime(timeEnd)
+    var iStart = nodeIndexOfTime(nodeList, timeStart)
+    var iEnd = nodeIndexOfTime(nodeList, timeEnd)
     return markerList.slice(iStart, iEnd);
 }
 
@@ -120,6 +127,8 @@ function setMarkers(nodes) {
     $("#slider-range").slider("option", "max", max);
 
     $("#slider-range").slider("option", "values", [min, max]);
+
+    plotCaseData(min, max);
   }
 }
 
@@ -143,7 +152,7 @@ async function animateMarkers() {
       markers.clearLayers();
       markers.addLayers(subMarkerList);
 
-      plotCaseData(i + animateStep/2);
+      plotCaseData(i, i + animateStep);
 
       document.getElementById("display_start_date").valueAsDate = epochMinsToDate(i)
       document.getElementById("display_end_date").valueAsDate = epochMinsToDate(i+animateWindow);
@@ -238,9 +247,12 @@ function updateMap() {
     xhr.send(null);
 }
 
-function plotCaseData(time) {
-    casesMarkerList = confirmed_cases.map(function (p) {
-        var count = findClosestCount(time, p.time_series);
+function plotCaseData(timeStart, timeEnd) {
+    casesMarkerList = timeSeriesConfirmed.map(function (p) {
+        var indexStart = nodeIndexOfTime(p.time_series, timeStart);
+        var indexEnd = nodeIndexOfTime(p.time_series, timeEnd);
+        var count =  p.time_series[indexEnd].cases - p.time_series[indexStart].cases;
+
         var icon = casesIcon(count);
         var marker = L.marker([p.lat, p.lng], {icon: icon});
         marker.count = count;
@@ -254,8 +266,8 @@ function plotCaseData(time) {
 function findClosestCount(time, time_series) {
     var i;
     for(i = 0; i<time_series.length; i++){
-        if(time_series[i].time - time < (24*60)) {
-            return time_series.count;
+        if(Math.abs(time_series[i].time - time) < (24*60)) {
+            return time_series[i].cases;
         }
     }
     return 0;
@@ -272,6 +284,10 @@ function casesIcon(numCases) {
       'line-height: ' + size + 'px;' +
       'font-weight: bold;' +
       'border: dashed red;';
+
+    if (numCases == 0) {
+        elemStyle += 'display: none;';
+    }
 
     return new L.DivIcon({ html: '<div style="' + elemStyle + '">' + numCases + '</div>', className: 'marker-cluster', iconSize: new L.Point(size, size) });
 }

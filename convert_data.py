@@ -24,8 +24,8 @@ def convert_row(row_dict):
       cases = int(cases_str)
       if cases > 0:
         date = parse(date_str)
-        epoch_seconds = date.timestamp() / 60;
-        time_series_list.append({'time': epoch_seconds, 'cases': cases})
+        epoch_mins = date.timestamp() / 60;
+        time_series_list.append({'time': epoch_mins, 'cases': cases})
 
   if time_series_list:
       return { 'name': location,
@@ -37,10 +37,10 @@ def convert_row(row_dict):
 
 parser = argparse.ArgumentParser()
 parser.add_argument('CSV_FILE', help='Input CSV file')
-parser.add_argument('JSON_FILE', help='Output JSON file')
+parser.add_argument('JS_FILE', help='Output JS file for JSON data')
+parser.add_argument('JS_VAR', help='Variable name in JS file')
 args = parser.parse_args()
 
-name = sys.argv[1]
 row_list = []
 with open(args.CSV_FILE, 'r') as csv_file:
   reader = csv.DictReader(csv_file)
@@ -48,5 +48,6 @@ with open(args.CSV_FILE, 'r') as csv_file:
       converted_row = convert_row(row)
       if converted_row:
         row_list.append(converted_row)
-with open(args.JSON_FILE, 'w') as json_file:
+with open(args.JS_FILE, 'w') as json_file:
+  json_file.write(args.JS_VAR + ' = ')
   json.dump(row_list, json_file);
