@@ -196,7 +196,7 @@ async function animateMarkers() {
       }
 
       if(confirmedCasesSelected){
-        plotCaseData(min, max);
+        plotCaseData(i, i+animateWindow);
       }
 
       document.getElementById("display_start_date").valueAsDate = epochMinsToDate(i)
@@ -254,7 +254,7 @@ function constructQueryURL() {
   var start_epoch_mins = dateToEpochMins(start_date);
   var end_epoch_mins = dateToEpochMins(end_date) + (1000 * 60) - 1;
 
-  var url = "https://newsstand.umiacs.umd.edu/news/disease_time_query" +
+  var url = "https://newsstand.umiacs.umd.edu/coronaviz/disease_time_query" +
         "?keyword=" + keyword +
         "&start_date=" + start_epoch_mins +
         "&end_date=" + end_epoch_mins;
