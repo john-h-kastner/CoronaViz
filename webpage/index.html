@@ -148,11 +148,21 @@
 
       <div class="col-md-4">
         <h2> Layer Controls </h2>
-        <label for="news_data_checkbox">News Keyword Data: </label>
+        <label for="news_data_checkbox">
+            <div class="circle_news_small"></div>
+            <div class="circle_news_med"></div>
+            <div class="circle_news_large"></div>
+            News Keyword:
+        </label>
         <input type="checkbox" id="news_data_checkbox" checked onclick="toggleNewsData();">
         <br>
 
-        <label for="confirmed_cases_checkbox">Confirmed Cases: </label>
+        <label for="confirmed_cases_checkbox">
+            <div class="circle_confirmed_small"></div>
+            <div class="circle_confirmed_med"></div>
+            <div class="circle_confirmed_large"></div>
+            Confirmed Cases:
+        </label>
         <input type="checkbox" id="confirmed_cases_checkbox" onclick="toggleConfirmedCases();">
       </div>
     </div>
