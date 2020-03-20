@@ -351,7 +351,7 @@ function setAnimateWindow(size) {
     document.getElementById("display_end_date").valueAsDate = epochMinsToDate(endDate);
     $("#slider-range").slider("values", [startDate, endDate]);
 
-    if (newDataSelected) {
+    if (newsDataSelected) {
       var subMarkerList = markersBetween(startDate, endDate);
       markers.clearLayers();
       markers.addLayers(subMarkerList);
