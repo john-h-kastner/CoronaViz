@@ -75,6 +75,7 @@ span.line {
   100% { transform: rotate(360deg); }
 }
 
+.circle_recovered_small, .circle_recovered_med, .circle_recovered_large,
 .circle_deaths_small, .circle_deaths_med, .circle_deaths_large,
 .circle_confirmed_small, .circle_confirmed_med, .circle_confirmed_large,
 .circle_news_small, .circle_news_med, .circle_news_large {
@@ -82,19 +83,19 @@ span.line {
   display: inline-block;
 }
 
-.circle_deaths_small, .circle_confirmed_small, .circle_news_small {
+.circle_recovered_small, .circle_deaths_small, .circle_confirmed_small, .circle_news_small {
   width: 0.5em;
   height: 0.5em;
   margin-bottom: 0.5em;
 }
 
-.circle_deaths_med, .circle_confirmed_med, .circle_news_med {
+.circle_recovered_med, .circle_deaths_med, .circle_confirmed_med, .circle_news_med {
   width: 1em;
   height: 1em;
   margin-bottom: 0.25em;
 }
 
-.circle_deaths_large, .circle_confirmed_large, .circle_news_large {
+.circle_recovered_large, .circle_deaths_large, .circle_confirmed_large, .circle_news_large {
   width: 1.5em;
   height: 1.5em;
 }
@@ -105,6 +106,10 @@ span.line {
 
 .circle_deaths_small, .circle_deaths_med, .circle_deaths_large {
   border: dashed red;
+}
+
+.circle_recovered_small, .circle_recovered_med, .circle_recovered_large {
+  border: dashed green;
 }
 
 .circle_news_small {

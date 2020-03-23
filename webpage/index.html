@@ -166,13 +166,23 @@
         <input type="checkbox" id="confirmed_cases_checkbox" onclick="toggleConfirmedCases();">
         <br>
 
-        <label for="confirmed_cases_checkbox">
+        <label for="deaths_checkbox">
             <div class="circle_deaths_small"></div>
             <div class="circle_deaths_med"></div>
             <div class="circle_deaths_large"></div>
             Deaths:
         </label>
         <input type="checkbox" id="deaths_checkbox" onclick="toggleDeaths();">
+        <br> 
+
+        <label for="recovered_checkbox">
+            <div class="circle_recovered_small"></div>
+            <div class="circle_recovered_med"></div>
+            <div class="circle_recovered_large"></div>
+            Recovered:
+        </label>
+        <input type="checkbox" id="recovered_checkbox" onclick="toggleRecovered();">
+
       </div>
     </div>
 
@@ -183,6 +193,7 @@
 
 <script src="time_series_19-covid-Confirmed.js"></script>
 <script src="time_series_19-covid-Deaths.js"></script>
+<script src="time_series_19-covid-Recovered.js"></script>
 <script src="js_buzz.js"></script>
 
 </body>

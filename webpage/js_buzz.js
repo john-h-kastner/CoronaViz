@@ -48,6 +48,19 @@ var deathsMarkers = L.markerClusterGroup({
 });
 map.addLayer(deathsMarkers);
 
+var recoveredMarkers = L.markerClusterGroup({
+    chunkedLoading: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: false,
+    chunkProgress: updateProgressBar,
+    iconCreateFunction: function(cluster) {
+        var childCount = cluster.getAllChildMarkers().reduce((a,v) => a + v.count, 0)
+        return casesIcon(childCount, 'green');
+    }
+});
+map.addLayer(recoveredMarkers);
+
+
 $( function() {
   $( "#slider-range" ).slider({
     range: true,
@@ -82,6 +95,7 @@ var animateSpeed = 100;
 var newsDataSelected = document.getElementById("news_data_checkbox").checked;
 var confirmedCasesSelected = document.getElementById("confirmed_cases_checkbox").checked;
 var deathsSelected = document.getElementById("deaths_checkbox").checked;
+var recoveredSelected = document.getElementById("recovered_checkbox").checked;
 
 function toggleNewsData() {
     newsDataSelected = ! newsDataSelected;
@@ -116,6 +130,17 @@ function toggleDeaths() {
         plotDeathsData(startDate, endDate);
     } else {
         deathsMarkers.clearLayers();
+    }
+}
+
+function toggleRecovered() {
+    recoveredSelected = ! recoveredSelected;
+    if(recoveredSelected) {
+        var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
+        var endDate = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
+        plotRecoveredData(startDate, endDate);
+    } else {
+        recoveredMarkers.clearLayers();
     }
 }
 
@@ -316,6 +341,21 @@ function plotDeathsData(timeStart, timeEnd) {
     deathsMarkers.addLayers(deathsMarkerList);
 }
 
+function plotRecoveredData(timeStart, timeEnd) {
+    recoveredMarkerList = timeSeriesRecovered.map(function (p) {
+        var indexStart = nodeIndexOfTime(p.time_series, timeStart);
+        var indexEnd = nodeIndexOfTime(p.time_series, timeEnd);
+        var count =  p.time_series[indexEnd].cases - p.time_series[indexStart].cases;
+
+        var icon = casesIcon(count, 'green');
+        var marker = L.marker([p.lat, p.lng], {icon: icon});
+        marker.count = count;
+        return marker;
+    });
+    recoveredMarkers.clearLayers();
+    recoveredMarkers.addLayers(recoveredMarkerList);
+}
+
 function casesIcon(numCases, color) {
     var size = markerSize(numCases) / 2;
 
@@ -380,6 +420,11 @@ function setDisplayedDateRange(startMins, endMins) {
     // Update deaths layer if applicable
     if(deathsSelected){
       plotDeathsData(startMins, endMins);
+    }
+
+     // Update recovered layer if applicable
+    if(recoveredSelected){
+      plotRecoveredData(startMins, endMins);
     }
 }
 
