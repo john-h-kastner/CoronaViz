@@ -88,7 +88,7 @@ class JHUDataLayer {
     plotData(timeStart, timeEnd){
         if( this.plottingLayer ){
             var temp = this;
-            markerList = this.timeSeries.map(function (p) {
+            var timeSeriesMarkers = this.timeSeries.map(function (p) {
                 var indexStart = nodeIndexOfTime(p.time_series, timeStart);
                 var indexEnd = nodeIndexOfTime(p.time_series, timeEnd);
                 var count =  p.time_series[indexEnd].cases - p.time_series[indexStart].cases;
@@ -99,7 +99,7 @@ class JHUDataLayer {
                 return marker;
             });
             this.markers.clearLayers();
-            this.markers.addLayers(markerList)
+            this.markers.addLayers(timeSeriesMarkers)
         }
     }
 
