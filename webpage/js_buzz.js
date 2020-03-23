@@ -31,10 +31,22 @@ var casesMarkers = L.markerClusterGroup({
     chunkProgress: updateProgressBar,
     iconCreateFunction: function(cluster) {
         var childCount = cluster.getAllChildMarkers().reduce((a,v) => a + v.count, 0)
-        return casesIcon(childCount);
+        return casesIcon(childCount, 'black');
     }
 });
 map.addLayer(casesMarkers);
+
+var deathsMarkers = L.markerClusterGroup({
+    chunkedLoading: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: false,
+    chunkProgress: updateProgressBar,
+    iconCreateFunction: function(cluster) {
+        var childCount = cluster.getAllChildMarkers().reduce((a,v) => a + v.count, 0)
+        return casesIcon(childCount, 'red');
+    }
+});
+map.addLayer(deathsMarkers);
 
 $( function() {
   $( "#slider-range" ).slider({
@@ -47,20 +59,8 @@ $( function() {
       var displayStartMins = ui.values[0];
       var displayEndMins = ui.values[1];
 
-      document.getElementById("display_start_date").valueAsDate = epochMinsToDate(displayStartMins);
-      document.getElementById("display_end_date").valueAsDate = epochMinsToDate(displayEndMins);
+      setDisplayedDateRange(displayStartMins, displayEndMins);
 
-      if(newsDataSelected){
-        var subMarkerList = markersBetween(displayStartMins, displayEndMins);
-        markers.clearLayers();
-        markers.addLayers(subMarkerList);
-      }
-
-      if(confirmedCasesSelected){
-        plotCaseData(displayStartMins, displayEndMins);
-      }
-
-      document.getElementById("animate_window").value = "Custom";
       animateWindow = displayEndMins - displayStartMins;
     }
   });
@@ -81,6 +81,7 @@ var animateSpeed = 100;
 
 var newsDataSelected = document.getElementById("news_data_checkbox").checked;
 var confirmedCasesSelected = document.getElementById("confirmed_cases_checkbox").checked;
+var deathsSelected = document.getElementById("deaths_checkbox").checked;
 
 function toggleNewsData() {
     newsDataSelected = ! newsDataSelected;
@@ -96,7 +97,6 @@ function toggleNewsData() {
     }
 }
 
-
 function toggleConfirmedCases() {
     confirmedCasesSelected = ! confirmedCasesSelected;
     if(confirmedCasesSelected) {
@@ -107,6 +107,19 @@ function toggleConfirmedCases() {
         casesMarkers.clearLayers();
     }
 }
+
+function toggleDeaths() {
+    deathsSelected = ! deathsSelected;
+    if(deathsSelected) {
+        var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
+        var endDate = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
+        plotDeathsData(startDate, endDate);
+    } else {
+        deathsMarkers.clearLayers();
+    }
+}
+
+
 
 
 //TODO: make this a binary search since that's definitely more efficient. To bad
@@ -154,20 +167,14 @@ function setMarkers(nodes) {
     var max = nodeList[nodeList.length - 1].time;
 
     dataStartDate = epochMinsToDate(min);
-    document.getElementById("start_date").valueAsDate = dataStartDate;
-    document.getElementById("display_start_date").valueAsDate = dataStartDate;
-    $("#slider-range").slider("option", "min", min);
-
     dataEndDate = epochMinsToDate(max)
+
+    document.getElementById("start_date").valueAsDate = dataStartDate;
     document.getElementById("end_date").valueAsDate = dataEndDate;
-    document.getElementById("display_end_date").valueAsDate = dataEndDate;
+    $("#slider-range").slider("option", "min", min);
     $("#slider-range").slider("option", "max", max);
 
-    $("#slider-range").slider("option", "values", [min, max]);
-
-    if(confirmedCasesSelected){
-      plotCaseData(min, max);
-    }
+    setDisplayedDateRange(min, max);
   }
 }
 
@@ -188,20 +195,7 @@ async function animateMarkers() {
     animating = true;
     for (var i = dateToEpochMins(dataStartDate); animating && i < dateToEpochMins(dataEndDate) - animateWindow; i+=animateStep) {
 
-
-      if(newsDataSelected){
-        var subMarkerList = markersBetween(i, i+animateWindow);
-        markers.clearLayers();
-        markers.addLayers(subMarkerList);
-      }
-
-      if(confirmedCasesSelected){
-        plotCaseData(i, i+animateWindow);
-      }
-
-      document.getElementById("display_start_date").valueAsDate = epochMinsToDate(i)
-      document.getElementById("display_end_date").valueAsDate = epochMinsToDate(i+animateWindow);
-      $("#slider-range").slider("values", [i, i+animateWindow]);
+      setDisplayedDateRange(i, i+animateWindow);
 
       await new Promise(r => setTimeout(r, animateSpeed));
     }
@@ -298,7 +292,7 @@ function plotCaseData(timeStart, timeEnd) {
         var indexEnd = nodeIndexOfTime(p.time_series, timeEnd);
         var count =  p.time_series[indexEnd].cases - p.time_series[indexStart].cases;
 
-        var icon = casesIcon(count);
+        var icon = casesIcon(count, 'black');
         var marker = L.marker([p.lat, p.lng], {icon: icon});
         marker.count = count;
         return marker;
@@ -307,9 +301,23 @@ function plotCaseData(timeStart, timeEnd) {
     casesMarkers.addLayers(casesMarkerList);
 }
 
-function casesIcon(numCases) {
+function plotDeathsData(timeStart, timeEnd) {
+    deathsMarkerList = timeSeriesDeaths.map(function (p) {
+        var indexStart = nodeIndexOfTime(p.time_series, timeStart);
+        var indexEnd = nodeIndexOfTime(p.time_series, timeEnd);
+        var count =  p.time_series[indexEnd].cases - p.time_series[indexStart].cases;
+
+        var icon = casesIcon(count, 'red');
+        var marker = L.marker([p.lat, p.lng], {icon: icon});
+        marker.count = count;
+        return marker;
+    });
+    deathsMarkers.clearLayers();
+    deathsMarkers.addLayers(deathsMarkerList);
+}
+
+function casesIcon(numCases, color) {
     var size = markerSize(numCases) / 2;
-    var color = markerColor(numCases);
 
     var elemStyle =
       'border-radius: 50%;' +
@@ -317,7 +325,7 @@ function casesIcon(numCases) {
       'height: ' + size + 'px;' +
       'line-height: ' + size + 'px;' +
       'font-weight: bold;' +
-      'border: dashed red;';
+      'border: dashed ' + color + ';';
 
     if (numCases == 0) {
         elemStyle += 'display: none;';
@@ -348,17 +356,30 @@ function setAnimateWindow(size) {
     var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
     var endDate = startDate + animateWindow;
 
-    document.getElementById("display_end_date").valueAsDate = epochMinsToDate(endDate);
-    $("#slider-range").slider("values", [startDate, endDate]);
+    setDisplayedDateRange(startDate, endDate);
+}
 
+function setDisplayedDateRange(startMins, endMins) {
+    // Set UI controls to reflect these values
+    document.getElementById("display_start_date").valueAsDate = epochMinsToDate(startMins);
+    document.getElementById("display_end_date").valueAsDate = epochMinsToDate(endMins);
+    $("#slider-range").slider("values", [startMins, endMins]);
+
+    // Update news data layer if applicable
     if (newsDataSelected) {
-      var subMarkerList = markersBetween(startDate, endDate);
+      var subMarkerList = markersBetween(startMins, endMins);
       markers.clearLayers();
       markers.addLayers(subMarkerList);
     }
 
+    // Update confirmed cases layer if applicable
     if(confirmedCasesSelected){
-      plotCaseData(startDate, endDate);
+      plotCaseData(startMins, endMins);
+    }
+
+    // Update deaths layer if applicable
+    if(deathsSelected){
+      plotDeathsData(startMins, endMins);
     }
 }
 

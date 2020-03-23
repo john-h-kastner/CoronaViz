@@ -75,30 +75,35 @@ span.line {
   100% { transform: rotate(360deg); }
 }
 
+.circle_deaths_small, .circle_deaths_med, .circle_deaths_large,
 .circle_confirmed_small, .circle_confirmed_med, .circle_confirmed_large,
 .circle_news_small, .circle_news_med, .circle_news_large {
   border-radius: 50%;
   display: inline-block;
 }
 
-.circle_confirmed_small, .circle_news_small {
+.circle_deaths_small, .circle_confirmed_small, .circle_news_small {
   width: 0.5em;
   height: 0.5em;
   margin-bottom: 0.5em;
 }
 
-.circle_confirmed_med, .circle_news_med {
+.circle_deaths_med, .circle_confirmed_med, .circle_news_med {
   width: 1em;
   height: 1em;
   margin-bottom: 0.25em;
 }
 
-.circle_confirmed_large, .circle_news_large {
+.circle_deaths_large, .circle_confirmed_large, .circle_news_large {
   width: 1.5em;
   height: 1.5em;
 }
 
 .circle_confirmed_small, .circle_confirmed_med, .circle_confirmed_large {
+  border: dashed black;
+}
+
+.circle_deaths_small, .circle_deaths_med, .circle_deaths_large {
   border: dashed red;
 }
 
