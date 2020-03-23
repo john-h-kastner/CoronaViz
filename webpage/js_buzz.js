@@ -137,6 +137,19 @@ var recoveredSelected = document.getElementById("recovered_checkbox").checked;
 var recoveredLayer = new JHUDataLayer('green', timeSeriesRecovered, recoveredSelected);
 
 var newsDataSelected = document.getElementById("news_data_checkbox").checked;
+function toggleNewsData() {
+    newsDataSelected = ! newsDataSelected;
+
+    if(newsDataSelected){
+        var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
+        var endDate = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
+        var subMarkerList = markersBetween(startDate, endDate);
+        markers.clearLayers();
+        markers.addLayers(subMarkerList);
+    } else {
+        markers.clearLayers();
+    }
+}
 
 //TODO: make this a binary search since that's definitely more efficient. To bad
 // I'm too lazy to do it right the first time. Well, it seems to work as is,
