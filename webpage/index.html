@@ -163,7 +163,7 @@
             <div class="circle_confirmed_large"></div>
             Confirmed Cases:
         </label>
-        <input type="checkbox" id="confirmed_cases_checkbox" onclick="toggleConfirmedCases();">
+        <input type="checkbox" id="confirmed_cases_checkbox" onclick="confirmedLayer.togglePlotting();">
         <br>
 
         <label for="deaths_checkbox">
@@ -172,7 +172,7 @@
             <div class="circle_deaths_large"></div>
             Deaths:
         </label>
-        <input type="checkbox" id="deaths_checkbox" onclick="toggleDeaths();">
+        <input type="checkbox" id="deaths_checkbox" onclick="deathsLayer.togglePlotting();">
         <br> 
 
         <label for="recovered_checkbox">
@@ -181,7 +181,7 @@
             <div class="circle_recovered_large"></div>
             Recovered:
         </label>
-        <input type="checkbox" id="recovered_checkbox" onclick="toggleRecovered();">
+        <input type="checkbox" id="recovered_checkbox" onclick="recoveredLayer.togglePlotting();">
 
       </div>
     </div>

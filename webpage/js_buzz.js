@@ -24,43 +24,6 @@ markers.on('spiderfied', function (a) {
     L.popup({maxHeight: 200}).setLatLng(a.cluster.getLatLng()).setContent(makePopupHtml(allArticles, a.markers[0].name)).openOn(map);
 });
 
-var casesMarkers = L.markerClusterGroup({
-    chunkedLoading: true,
-    showCoverageOnHover: false,
-    zoomToBoundsOnClick: false,
-    chunkProgress: updateProgressBar,
-    iconCreateFunction: function(cluster) {
-        var childCount = cluster.getAllChildMarkers().reduce((a,v) => a + v.count, 0)
-        return casesIcon(childCount, 'black');
-    }
-});
-map.addLayer(casesMarkers);
-
-var deathsMarkers = L.markerClusterGroup({
-    chunkedLoading: true,
-    showCoverageOnHover: false,
-    zoomToBoundsOnClick: false,
-    chunkProgress: updateProgressBar,
-    iconCreateFunction: function(cluster) {
-        var childCount = cluster.getAllChildMarkers().reduce((a,v) => a + v.count, 0)
-        return casesIcon(childCount, 'red');
-    }
-});
-map.addLayer(deathsMarkers);
-
-var recoveredMarkers = L.markerClusterGroup({
-    chunkedLoading: true,
-    showCoverageOnHover: false,
-    zoomToBoundsOnClick: false,
-    chunkProgress: updateProgressBar,
-    iconCreateFunction: function(cluster) {
-        var childCount = cluster.getAllChildMarkers().reduce((a,v) => a + v.count, 0)
-        return casesIcon(childCount, 'green');
-    }
-});
-map.addLayer(recoveredMarkers);
-
-
 $( function() {
   $( "#slider-range" ).slider({
     range: true,
@@ -91,61 +54,89 @@ var animateWindow = 7 * 24 * 60;
 var animateStep = 24 * 60;
 var animateSpeed = 100;
 
+class JHUDataLayer {
+    constructor(color, timeSeries, plottingLayer) {
+        this.color = color;
+        this.timeSeries = timeSeries;
+        this.plottingLayer = plottingLayer;
+
+        var temp = this;
+        this.markers = L.markerClusterGroup({
+            chunkedLoading: true,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: false,
+            chunkProgress: updateProgressBar,
+            iconCreateFunction: function(cluster) {
+                var childCount = cluster.getAllChildMarkers().reduce((a,v) => a + v.count, 0)
+                return temp.layerIcon(childCount);
+            }
+        });
+        map.addLayer(this.markers);
+    }
+
+    togglePlotting() {
+        this.plottingLayer = ! this.plottingLayer;
+        if(this.plottingLayer) {
+            var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
+            var endDate = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
+            this.plotData(startDate, endDate);
+        } else {
+            this.markers.clearLayers();
+        }
+    }
+
+    plotData(timeStart, timeEnd){
+        if( this.plottingLayer ){
+            var temp = this;
+            markerList = this.timeSeries.map(function (p) {
+                var indexStart = nodeIndexOfTime(p.time_series, timeStart);
+                var indexEnd = nodeIndexOfTime(p.time_series, timeEnd);
+                var count =  p.time_series[indexEnd].cases - p.time_series[indexStart].cases;
+
+                var icon = temp.layerIcon(count);
+                var marker = L.marker([p.lat, p.lng], {icon: icon});
+                marker.count = count;
+                return marker;
+            });
+            this.markers.clearLayers();
+            this.markers.addLayers(markerList)
+        }
+    }
+
+    layerIcon(count) {
+        var size = markerSize(count) / 2;
+
+        var elemStyle =
+          'border-radius: 50%;' +
+          'width: '  + size + 'px;' +
+          'height: ' + size + 'px;' +
+          'line-height: ' + size + 'px;' +
+          'font-weight: bold;' +
+          'border: dashed ' + this.color + ';';
+
+        if (count == 0) {
+            elemStyle += 'display: none;';
+        }
+
+        return new L.DivIcon({
+            html: '<div style="' + elemStyle + '">' + count + '</div>',
+            className: 'marker-cluster',
+            iconSize: new L.Point(size, size)
+        });
+    }
+}
+
+
+var confirmedCasesSelected = document.getElementById("confirmed_cases_checkbox").checked;
+var confirmedLayer = new JHUDataLayer('black', timeSeriesConfirmed, confirmedCasesSelected);
+
+var deathsSelected = document.getElementById("deaths_checkbox").checked;
+var deathsLayer = new JHUDataLayer('red', timeSeriesDeaths, deathsSelected);
+
+var recoveredSelected = document.getElementById("recovered_checkbox").checked;
+var recoveredLayer = new JHUDataLayer('green', timeSeriesRecovered, recoveredSelected);
 
 var newsDataSelected = document.getElementById("news_data_checkbox").checked;
-var confirmedCasesSelected = document.getElementById("confirmed_cases_checkbox").checked;
-var deathsSelected = document.getElementById("deaths_checkbox").checked;
-var recoveredSelected = document.getElementById("recovered_checkbox").checked;
-
-function toggleNewsData() {
-    newsDataSelected = ! newsDataSelected;
-
-    if(newsDataSelected){
-        var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
-        var endDate = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
-        var subMarkerList = markersBetween(startDate, endDate);
-        markers.clearLayers();
-        markers.addLayers(subMarkerList);
-    } else {
-        markers.clearLayers();
-    }
-}
-
-function toggleConfirmedCases() {
-    confirmedCasesSelected = ! confirmedCasesSelected;
-    if(confirmedCasesSelected) {
-        var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
-        var endDate = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
-        plotCaseData(startDate, endDate);
-    } else {
-        casesMarkers.clearLayers();
-    }
-}
-
-function toggleDeaths() {
-    deathsSelected = ! deathsSelected;
-    if(deathsSelected) {
-        var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
-        var endDate = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
-        plotDeathsData(startDate, endDate);
-    } else {
-        deathsMarkers.clearLayers();
-    }
-}
-
-function toggleRecovered() {
-    recoveredSelected = ! recoveredSelected;
-    if(recoveredSelected) {
-        var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
-        var endDate = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
-        plotRecoveredData(startDate, endDate);
-    } else {
-        recoveredMarkers.clearLayers();
-    }
-}
-
-
-
 
 //TODO: make this a binary search since that's definitely more efficient. To bad
 // I'm too lazy to do it right the first time. Well, it seems to work as is,
@@ -311,69 +302,6 @@ function updateMap() {
     xhr.send(null);
 }
 
-function plotCaseData(timeStart, timeEnd) {
-    casesMarkerList = timeSeriesConfirmed.map(function (p) {
-        var indexStart = nodeIndexOfTime(p.time_series, timeStart);
-        var indexEnd = nodeIndexOfTime(p.time_series, timeEnd);
-        var count =  p.time_series[indexEnd].cases - p.time_series[indexStart].cases;
-
-        var icon = casesIcon(count, 'black');
-        var marker = L.marker([p.lat, p.lng], {icon: icon});
-        marker.count = count;
-        return marker;
-    });
-    casesMarkers.clearLayers();
-    casesMarkers.addLayers(casesMarkerList);
-}
-
-function plotDeathsData(timeStart, timeEnd) {
-    deathsMarkerList = timeSeriesDeaths.map(function (p) {
-        var indexStart = nodeIndexOfTime(p.time_series, timeStart);
-        var indexEnd = nodeIndexOfTime(p.time_series, timeEnd);
-        var count =  p.time_series[indexEnd].cases - p.time_series[indexStart].cases;
-
-        var icon = casesIcon(count, 'red');
-        var marker = L.marker([p.lat, p.lng], {icon: icon});
-        marker.count = count;
-        return marker;
-    });
-    deathsMarkers.clearLayers();
-    deathsMarkers.addLayers(deathsMarkerList);
-}
-
-function plotRecoveredData(timeStart, timeEnd) {
-    recoveredMarkerList = timeSeriesRecovered.map(function (p) {
-        var indexStart = nodeIndexOfTime(p.time_series, timeStart);
-        var indexEnd = nodeIndexOfTime(p.time_series, timeEnd);
-        var count =  p.time_series[indexEnd].cases - p.time_series[indexStart].cases;
-
-        var icon = casesIcon(count, 'green');
-        var marker = L.marker([p.lat, p.lng], {icon: icon});
-        marker.count = count;
-        return marker;
-    });
-    recoveredMarkers.clearLayers();
-    recoveredMarkers.addLayers(recoveredMarkerList);
-}
-
-function casesIcon(numCases, color) {
-    var size = markerSize(numCases) / 2;
-
-    var elemStyle =
-      'border-radius: 50%;' +
-      'width: '  + size + 'px;' +
-      'height: ' + size + 'px;' +
-      'line-height: ' + size + 'px;' +
-      'font-weight: bold;' +
-      'border: dashed ' + color + ';';
-
-    if (numCases == 0) {
-        elemStyle += 'display: none;';
-    }
-
-    return new L.DivIcon({ html: '<div style="' + elemStyle + '">' + numCases + '</div>', className: 'marker-cluster', iconSize: new L.Point(size, size) });
-}
-
 function updateProgressBar(processed, total, elapsed, layersArray) {
     var progress = document.getElementById('progress');
     var progressBar = document.getElementById('progress-bar');
@@ -412,20 +340,10 @@ function setDisplayedDateRange(startMins, endMins) {
       markers.addLayers(subMarkerList);
     }
 
-    // Update confirmed cases layer if applicable
-    if(confirmedCasesSelected){
-      plotCaseData(startMins, endMins);
-    }
-
-    // Update deaths layer if applicable
-    if(deathsSelected){
-      plotDeathsData(startMins, endMins);
-    }
-
-     // Update recovered layer if applicable
-    if(recoveredSelected){
-      plotRecoveredData(startMins, endMins);
-    }
+    // Update JHU data layers
+    confirmedLayer.plotData(startMins, endMins);
+    deathsLayer.plotData(startMins, endMins);
+    recoveredLayer.plotData(startMins, endMins);
 }
 
 function setAnimateStep(step) {
