@@ -4,7 +4,7 @@ body {
 }
 
 .map_container {
-  padding-top: 4.5rem;
+  padding-top: 4.0rem;
 }
 
 #map {
@@ -19,7 +19,7 @@ span.line {
 #slider-range {
   margin-left: 1em;
   margin-right: 1em;
-  margin-top: 1em;
+  margin-top: 0.5em;
 }
 
 #progress {
@@ -60,6 +60,14 @@ span.line {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+
+@media (min-width: 768px) {
+  #control_panel {
+    overflow-y: scroll;
+    height: 80vh;
+  }
 }
 
 .circle_recovered_small, .circle_recovered_med, .circle_recovered_large,
