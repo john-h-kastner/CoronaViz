@@ -68,23 +68,26 @@ span.line {
 .circle_news_small, .circle_news_med, .circle_news_large {
   border-radius: 50%;
   display: inline-block;
+  text-align: center;
+  font-weight: bold;
 }
 
 .circle_recovered_small, .circle_deaths_small, .circle_confirmed_small, .circle_news_small {
-  width: 0.5em;
-  height: 0.5em;
-  margin-bottom: 0.5em;
+  width: 25px;
+  height: 25px;
+  line-height: 25px;
 }
 
 .circle_recovered_med, .circle_deaths_med, .circle_confirmed_med, .circle_news_med {
-  width: 1em;
-  height: 1em;
-  margin-bottom: 0.25em;
+  width: 41px;
+  height: 41px;
+  line-height: 41px;
 }
 
 .circle_recovered_large, .circle_deaths_large, .circle_confirmed_large, .circle_news_large {
-  width: 1.5em;
-  height: 1.5em;
+  width: 59px;
+  height: 59px;
+  line-height: 59px;
 }
 
 .circle_confirmed_small, .circle_confirmed_med, .circle_confirmed_large {

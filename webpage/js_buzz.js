@@ -104,7 +104,7 @@ class JHUDataLayer {
     }
 
     layerIcon(count) {
-        var size = markerSize(count) / 2;
+        var size = markerSize(count);
 
         var elemStyle =
           'border-radius: 50%;' +
@@ -254,7 +254,7 @@ function markerIcon(clusterSize) {
 }
 
 function markerSize(clusterSize) {
-  return 40 + Math.log(clusterSize)**2;
+  return 20 + Math.log(clusterSize)**2;
 }
 
 function markerColor(clusterSize) {
