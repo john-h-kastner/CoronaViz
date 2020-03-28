@@ -100,7 +100,7 @@
         </span>
         
         <br>
-        <span class="btn btn-secondary" id="update" onclick="updateMap();">Download Data &raquo;</span>
+        <span class="btn btn-secondary" id="update" onclick="twitterLayer.updateLayer(); newsLayer.updateLayer();">Download Data &raquo;</span>
         <hr>
       </div>
 
@@ -152,8 +152,18 @@
             <div class="circle_news_large">100</div>
             News Keyword:
         </label>
-        <input type="checkbox" id="news_data_checkbox" checked onclick="toggleNewsData();">
+        <input type="checkbox" id="news_data_checkbox" checked onclick="newsLayer.togglePlotting();">
         <br>
+
+        <label for="twitter_data_checkbox">
+            <div class="circle_twitter_small">1</div>
+            <div class="circle_twitter_med">10</div>
+            <div class="circle_twitter_large">100</div>
+            Twitter:
+        </label>
+        <input type="checkbox" id="twitter_data_checkbox" onclick="twitterLayer.togglePlotting();">
+        <br>
+
 
         <label for="confirmed_cases_checkbox">
             <div class="circle_confirmed_small">1</div>

@@ -70,6 +70,7 @@ span.line {
   }
 }
 
+.circle_twitter_small, .circle_twitter_med, .circle_twitter_large,
 .circle_recovered_small, .circle_recovered_med, .circle_recovered_large,
 .circle_deaths_small, .circle_deaths_med, .circle_deaths_large,
 .circle_confirmed_small, .circle_confirmed_med, .circle_confirmed_large,
@@ -80,19 +81,19 @@ span.line {
   font-weight: bold;
 }
 
-.circle_recovered_small, .circle_deaths_small, .circle_confirmed_small, .circle_news_small {
+.circle_twitter_small, .circle_recovered_small, .circle_deaths_small, .circle_confirmed_small, .circle_news_small {
   width: 25px;
   height: 25px;
   line-height: 25px;
 }
 
-.circle_recovered_med, .circle_deaths_med, .circle_confirmed_med, .circle_news_med {
+.circle_twitter_med, .circle_recovered_med, .circle_deaths_med, .circle_confirmed_med, .circle_news_med {
   width: 41px;
   height: 41px;
   line-height: 41px;
 }
 
-.circle_recovered_large, .circle_deaths_large, .circle_confirmed_large, .circle_news_large {
+.circle_twitter_large, .circle_recovered_large, .circle_deaths_large, .circle_confirmed_large, .circle_news_large {
   width: 59px;
   height: 59px;
   line-height: 59px;
@@ -108,6 +109,10 @@ span.line {
 
 .circle_recovered_small, .circle_recovered_med, .circle_recovered_large {
   border: dashed green;
+}
+
+.circle_twitter_small, .circle_twitter_med, .circle_twitter_large {
+  background-color: rgba(0, 0, 255, 0.6);
 }
 
 .circle_news_small {
