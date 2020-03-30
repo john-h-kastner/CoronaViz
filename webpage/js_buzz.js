@@ -290,7 +290,7 @@ var newsLayer = new NewsStandDataLayer(newsDataSelected,
 var twitterDataSelected = document.getElementById("twitter_data_checkbox").checked;
 var twitterLayer = new NewsStandDataLayer(twitterDataSelected,
     function(clusterSize){
-        return color = 'rgba(0, 0, 255, 0.6)';
+        return color = 'rgba(85, 85, 250, 0.6)';
     },
     function() {
       var start_date = new Date(document.getElementById('start_date').value);
