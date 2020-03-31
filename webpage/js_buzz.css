@@ -4,7 +4,7 @@ body {
 }
 
 .map_container {
-  padding-top: 4.0rem;
+  padding-top: 5.5rem;
 }
 
 #map {
@@ -15,6 +15,7 @@ body {
 span.line {
   display: inline-block;
 }
+
 
 #slider-range {
   margin-left: 1em;
