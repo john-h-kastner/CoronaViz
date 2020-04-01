@@ -35,6 +35,8 @@ var dataEndDate;
 var animateWindow = 7 * 24 * 60;
 var animateStep = 24 * 60;
 var animateSpeed = 100;
+var cumulativeAnimation = document.getElementById("cumulative_animation").checked;
+document.getElementById("animate_window").disabled = cumulativeAnimation;
 
 class NewsStandDataLayer {
     constructor(plottingLayer, color_fn, url_fn) {
@@ -58,6 +60,9 @@ class NewsStandDataLayer {
         this.url_fn = url_fn;
         this.markerList = [];
         this.node_list = [];
+
+        this.display_start_date = undefined;
+        this.display_end_Date = undefined;
     }
 
     togglePlotting() {
@@ -168,9 +173,18 @@ class NewsStandDataLayer {
 
     plotData(timeStart, timeEnd){
         if(this.plottingLayer){
-            var subMarkerList = this.markersBetween(timeStart, timeEnd);
-            this.markers.clearLayers();
-            this.markers.addLayers(subMarkerList);
+            // Special handeling for incremental animation
+            if(this.display_start_date == timeStart && timeEnd > this.display_end_date) {
+                var subMarkerList = this.markersBetween(this.display_end_date, timeEnd);
+                this.markers.addLayers(subMarkerList);
+                this.display_end_date = timeEnd;
+            } else {
+                this.display_start_date = timeStart;
+                this.display_end_date = timeEnd;
+                var subMarkerList = this.markersBetween(timeStart, timeEnd);
+                this.markers.clearLayers();
+                this.markers.addLayers(subMarkerList);
+            }
         }
     }
 
@@ -333,9 +347,14 @@ async function animateMarkers() {
   if (!animating) {
     document.getElementById("animate").innerHTML = 'Stop Animation';
     animating = true;
-    for (var i = dateToEpochMins(dataStartDate); animating && i < dateToEpochMins(dataEndDate) - animateWindow; i+=animateStep) {
+    var start = dateToEpochMins(dataStartDate);
+    for (var i = start; animating && i < dateToEpochMins(dataEndDate) - animateWindow; i+=animateStep) {
 
-      setDisplayedDateRange(i, i+animateWindow);
+      if(cumulativeAnimation){
+        setDisplayedDateRange(start, i+animateWindow);
+      } else {
+        setDisplayedDateRange(i, i+animateWindow);
+      }
 
       await new Promise(r => setTimeout(r, animateSpeed));
     }
@@ -406,4 +425,9 @@ function setAnimateStep(step) {
 
 function setAnimateSpeed(speed) {
     animateSpeed = parseInt(speed);
+}
+
+function toggleCumulative() {
+    cumulativeAnimation = ! cumulativeAnimation;
+    document.getElementById("animate_window").disabled = cumulativeAnimation;
 }
