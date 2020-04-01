@@ -250,13 +250,13 @@ class JHUDataLayer {
 
 
 var confirmedCasesSelected = document.getElementById("confirmed_cases_checkbox").checked;
-var confirmedLayer = new JHUDataLayer('black', timeSeriesConfirmed, confirmedCasesSelected);
+var confirmedLayer = new JHUDataLayer('black', timeSeriesconfirmed, confirmedCasesSelected);
 
 var deathsSelected = document.getElementById("deaths_checkbox").checked;
-var deathsLayer = new JHUDataLayer('red', timeSeriesDeaths, deathsSelected);
+var deathsLayer = new JHUDataLayer('red', timeSeriesdeaths, deathsSelected);
 
 var recoveredSelected = document.getElementById("recovered_checkbox").checked;
-var recoveredLayer = new JHUDataLayer('green', timeSeriesRecovered, recoveredSelected);
+var recoveredLayer = new JHUDataLayer('green', timeSeriesrecovered, recoveredSelected);
 
 var newsDataSelected = document.getElementById("news_data_checkbox").checked;
 var newsLayer = new NewsStandDataLayer(newsDataSelected,
