@@ -201,7 +201,6 @@ class JHUDataLayer {
             chunkedLoading: true,
             showCoverageOnHover: false,
             zoomToBoundsOnClick: false,
-            chunkProgress: updateProgressBar,
             iconCreateFunction: function(cluster) {
                 var childCount = cluster.getAllChildMarkers().reduce((a,v) => a + v.count, 0)
                 return that.layerIcon(childCount);
