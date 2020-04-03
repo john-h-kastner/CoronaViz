@@ -15,6 +15,35 @@ span.line {
   display: inline-block;
 }
 
+.hjs_text {
+  background-color: #FFFFF6;
+  line-height: 1.2;
+  font-family: "Helvetica", Helvet, serif;
+}
+ 
+.hjs_text h4, .hjs_text h5 {
+  width: 100%;
+  font-weight: bold;
+  font-size 20pt;
+  color: #ffffff;
+  font-family: Arial, helvetica;
+  background-color: #D5D0CD;
+  border: 1px solid gray;
+}
+
+.hjs_text a {
+  color: #986635;
+}
+
+.hjs_text a:hover {
+  color: red;
+  background:  #aaaaaa;
+}
+
+.hjs_text ol {
+  list-style-position: outside; 
+} 
+
 
 #slider-range {
   margin-left: 1em;
