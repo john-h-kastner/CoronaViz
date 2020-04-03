@@ -61,9 +61,6 @@
       <li class="nav-item">
         <a class="nav-link" href="https://github.com/jackastner/CoronaViz">GitHub</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="test.html">Extened Dataset Demo</a>
-      </li>
     </ul>
   </div>
 </nav>
@@ -207,7 +204,7 @@
      </div>
 
      <div id="control_panel" class="col-md-4">
-      <div>
+      <div style='display: none;'>
         <h2>Download Controls</h2>
 
         <span class="line">
@@ -235,8 +232,8 @@
       <div>
         <h2>Animation Controls</h2>
 
-        <span class="line">
-        <label for="animate_window">Animation Window:</label>
+        <span style="display: none;" class="line">
+        <label  for="animate_window">Animation Window:</label>
         <select id="animate_window" onchange="setAnimateWindow(this.value)">
           <option value="60">Hour</option>
           <option value="1140">Day</option>
@@ -247,7 +244,7 @@
         </span>
         <br>
 
-        <span class="line">
+        <span style="display: none;" class="line">
         <label for="cumulative_animation">Cumulative Animation:</label>
         <input type="checkbox" id="cumulative_animation" onclick="toggleCumulative();">
         </span>
@@ -289,13 +286,13 @@
         <input type="checkbox" id="news_data_checkbox" checked onclick="newsLayer.togglePlotting();">
         <br>
 
-        <label for="twitter_data_checkbox">
+        <label style="display: none;" for="twitter_data_checkbox">
             <div class="circle_twitter_small">1</div>
             <div class="circle_twitter_med">10</div>
             <div class="circle_twitter_large">100</div>
             Tweet Keywords:
         </label>
-        <input type="checkbox" id="twitter_data_checkbox" onclick="twitterLayer.togglePlotting();">
+        <input style="display: none;" type="checkbox" id="twitter_data_checkbox" onclick="twitterLayer.togglePlotting();">
         <br>
 
 
@@ -335,6 +332,6 @@
 <script src="time_series_19-covid-confirmed.js"></script>
 <script src="time_series_19-covid-deaths.js"></script>
 <script src="time_series_19-covid-recovered.js"></script>
-<script src="js_buzz.js"></script>
+<script src="test.js"></script>
 </body>
 </html>
