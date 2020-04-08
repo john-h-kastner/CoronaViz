@@ -22,10 +22,9 @@ def convert_row(row_dict):
   time_series_list = []
   for date_str, cases_str in row_dict.items():
       cases = int(cases_str)
-      if cases > 0:
-        date = parse(date_str)
-        epoch_mins = date.timestamp() / 60;
-        time_series_list.append({'time': epoch_mins, 'cases': cases})
+      date = parse(date_str)
+      epoch_mins = date.timestamp() / 60;
+      time_series_list.append({'time': epoch_mins, 'cases': cases})
 
   if time_series_list:
       return { 'name': location,
@@ -57,10 +56,9 @@ def convert_row_us(row_dict):
   time_series_list = []
   for date_str, cases_str in row_dict.items():
       cases = int(cases_str)
-      if cases > 0:
-        date = parse(date_str)
-        epoch_mins = date.timestamp() / 60;
-        time_series_list.append({'time': epoch_mins, 'cases': cases})
+      date = parse(date_str)
+      epoch_mins = date.timestamp() / 60;
+      time_series_list.append({'time': epoch_mins, 'cases': cases})
 
   if time_series_list:
       return { 'name': location,
@@ -70,31 +68,69 @@ def convert_row_us(row_dict):
   else:
       return None
 
+def read_time_series(name):
+    jhu_data_dir = "COVID-19/csse_covid_19_data/csse_covid_19_time_series"
+    world_csv_file = jhu_data_dir + "/time_series_covid19_" + name + "_global.csv"
+    us_csv_file = jhu_data_dir + "/time_series_covid19_" + name + "_US.csv"
 
-parser = argparse.ArgumentParser()
-parser.add_argument('GLOBE_CSV_FILE', help='Input global CSV file')
-parser.add_argument('US_CSV_FILE', help='Input US CSV file')
-parser.add_argument('JS_FILE', help='Output JS file for JSON data')
-parser.add_argument('JS_VAR', help='Variable name in JS file')
-args = parser.parse_args()
-
-row_list = []
-with open(args.GLOBE_CSV_FILE, 'r') as csv_file:
-  reader = csv.DictReader(csv_file)
-  for row in reader:
-      if(row['Country/Region'] != 'US'):
-          converted_row = convert_row(row)
-          if converted_row:
-            row_list.append(converted_row)
-try:
-    with open(args.US_CSV_FILE, 'r') as csv_file:
+    row_list = []
+    with open(world_csv_file, 'r') as csv_file:
       reader = csv.DictReader(csv_file)
       for row in reader:
-          converted_row = convert_row_us(row)
-          if converted_row:
-            row_list.append(converted_row)
-except FileNotFoundError:
-    print('US DATA FILE NOT FOUND')
-with open(args.JS_FILE, 'w') as json_file:
-  json_file.write(args.JS_VAR + ' = ')
-  json.dump(row_list, json_file);
+          if(row['Country/Region'] != 'US'):
+              converted_row = convert_row(row)
+              if converted_row:
+                row_list.append(converted_row)
+    try:
+        with open(us_csv_file, 'r') as csv_file:
+          reader = csv.DictReader(csv_file)
+          for row in reader:
+              converted_row = convert_row_us(row)
+              if converted_row:
+                row_list.append(converted_row)
+    except FileNotFoundError:
+        print('US DATA FILE NOT FOUND')
+    return row_list
+
+data_series = ["confirmed", "recovered", "deaths"]
+confirmed = read_time_series("confirmed")
+recovered = read_time_series("recovered")
+deaths = read_time_series("deaths")
+
+row_list = []
+for i in range(0,len(confirmed)):
+    confirmed_entry = confirmed[i]
+    deaths_entry = next((e for e in deaths if e['name'] == confirmed_entry['name']))
+    recovered_entry = next((e for e in recovered if e['name'] == confirmed_entry['name']), None)
+
+    time_series = []
+    if recovered_entry:
+        for (c,d,r) in zip(confirmed_entry['time_series'], deaths_entry['time_series'], recovered_entry['time_series']):
+            time_series_entry = {
+                'time': c['time'],
+                'confirmed': c['cases'],
+                'deaths': d['cases'],
+                'recovered': r['cases']
+            }
+            time_series.append(time_series_entry)
+    else:
+        for (c,d) in zip(confirmed_entry['time_series'], deaths_entry['time_series']):
+            time_series_entry = {
+                'time': c['time'],
+                'confirmed': c['cases'],
+                'deaths': d['cases'],
+                'recovered': 0
+            }
+            time_series.append(time_series_entry)
+        
+    row_list.append({
+        'name': confirmed_entry['name'],
+        'lat': confirmed_entry['lat'],
+        'lng': confirmed_entry['lng'],
+        'time_series': time_series
+    })
+
+
+with open('webpage/jhu_data.js', 'w') as json_file:
+  json_file.write('jhuData = ')
+  json.dump(row_list, json_file)

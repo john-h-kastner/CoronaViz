@@ -312,7 +312,7 @@
             <div class="circle_confirmed_large">100</div>
             Confirmed Cases:
         </label>
-        <input type="checkbox" id="confirmed_cases_checkbox" onclick="confirmedLayer.togglePlotting();">
+        <input type="checkbox" id="confirmed_cases_checkbox" onclick="jhuLayer.togglePlotting('confirmed');">
         <br>
 
         <label for="deaths_checkbox">
@@ -321,7 +321,7 @@
             <div class="circle_deaths_large">100</div>
             Deaths:
         </label>
-        <input type="checkbox" id="deaths_checkbox" onclick="deathsLayer.togglePlotting();">
+        <input type="checkbox" id="deaths_checkbox" onclick="jhuLayer.togglePlotting('deaths');">
         <br>
 
         <label for="recovered_checkbox">
@@ -330,7 +330,7 @@
             <div class="circle_recovered_large">100</div>
             Recoveries:
         </label>
-        <input type="checkbox" id="recovered_checkbox" onclick="recoveredLayer.togglePlotting();">
+        <input type="checkbox" id="recovered_checkbox" onclick="jhuLayer.togglePlotting('recoveries');">
         <hr>
 
       </div>
@@ -339,9 +339,11 @@
   </div>
 </main>
 
-<script src="time_series_19-covid-confirmed.js"></script>
+<!--<script src="time_series_19-covid-confirmed.js"></script>
 <script src="time_series_19-covid-deaths.js"></script>
-<script src="time_series_19-covid-recovered.js"></script>
+<script src="time_series_19-covid-recovered.js"></script>-->
+
+<script src="jhu_data.js"></script>
 <script src="js_buzz.js"></script>
 </body>
 </html>

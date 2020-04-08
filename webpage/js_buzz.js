@@ -11,23 +11,21 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
     id: 'mapbox.streets',
 }).addTo(map);
 
-$( function() {
-  $( "#slider-range" ).slider({
-    range: true,
-    min: 0,
-    max: 100,
-    values: [ 0, 100 ],
-    slide: function( event, ui ) {
-      terminateAnimation();
-      var displayStartMins = ui.values[0];
-      var displayEndMins = ui.values[1];
+$( "#slider-range" ).slider({
+  range: true,
+  min: 0,
+  max: 100,
+  values: [ 0, 100 ],
+  slide: function( event, ui ) {
+    terminateAnimation();
+    var displayStartMins = ui.values[0];
+    var displayEndMins = ui.values[1];
 
-      setDisplayedDateRange(displayStartMins, displayEndMins);
+    setDisplayedDateRange(displayStartMins, displayEndMins);
 
-      animateWindow = displayEndMins - displayStartMins;
-    }
-  });
-} );
+    animateWindow = displayEndMins - displayStartMins;
+  }
+});
 
 var dataStartDate;
 var dataEndDate;
@@ -177,10 +175,22 @@ class NewsStandDataLayer {
 }
 
 class JHUDataLayer {
-    constructor(color, timeSeries, plottingLayer) {
-        this.color = color;
-        this.timeSeries = timeSeries;
-        this.plottingLayer = plottingLayer;
+    constructor(plottingConfirmed, plottingDeaths, plottingRecoveries) {
+        this.timeSeries = jhuData;
+        this.subLayers = {
+            confirmed: {
+                color: 'black',
+                plotting: plottingConfirmed
+            },
+            deaths: {
+                color: 'red',
+                plotting: plottingDeaths
+            },
+            recoveries: {
+                color: 'green',
+                plotting: plottingRecoveries
+            }
+        }
 
         var that = this;
         this.markers = L.markerClusterGroup({
@@ -188,74 +198,159 @@ class JHUDataLayer {
             showCoverageOnHover: false,
             zoomToBoundsOnClick: false,
             iconCreateFunction: function(cluster) {
-                var childCount = cluster.getAllChildMarkers().reduce((a,v) => a + v.count, 0)
-                return that.layerIcon(childCount);
+                var confirmed = cluster.getAllChildMarkers().reduce((a,v) => a + v.confirmed, 0)
+                var deaths = cluster.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0)
+                var recoveries = cluster.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0)
+                return that.layerIcon(confirmed, deaths, recoveries);
             }
         });
+        this.clusterPopup = undefined;
+        this.markers.on('clustermouseover', function (a) {
+            if (that.clusterPopup != undefined) {
+                map.closePopup();
+            }
+            var confirmed = a.layer.getAllChildMarkers().reduce((a,v) => a + v.confirmed, 0)
+            var deaths = a.layer.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0)
+            var recoveries = a.layer.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0)
+
+            that.clusterPopup = L.popup()
+              .setLatLng(a.layer.getLatLng())
+              .setContent("<ul><li>Confirmed: " + confirmed + "</li><li>Deaths: " + deaths  + "</li><li> Recoveries:" + recoveries + "</li></ul>")
+              .openOn(map);
+        });
+        this.markers.on('clustermouseout', function (a) {
+            if (that.clusterPopup != undefined) {
+                map.closePopup();
+            }
+            that.clusterPopup = undefined;
+        });
         map.addLayer(this.markers);
+
+        this.timeSeriesMarkers = this.timeSeries.map(function (p) {
+            var marker = L.marker([p.lat, p.lng]);
+            marker.time_series = p.time_series;
+            marker.on('mouseover', function(e) {
+                this.openPopup();
+            });
+            marker.on('mouseout', function(e) {
+                this.closePopup();
+            });
+            return marker;
+        });
+        this.markers.clearLayers();
+        this.markers.addLayers(this.timeSeriesMarkers)
+
     }
 
-    togglePlotting() {
-        this.plottingLayer = ! this.plottingLayer;
-        if(this.plottingLayer) {
+    plottingAny() {
+        return Object.values(this.subLayers).reduce(
+            function (a,b) {
+                return a || b.plotting;
+            },
+            false);
+    }
+
+    togglePlotting(subLayer) {
+        if(!this.plottingAny()){
+            map.addLayer(this.markers);
+        }
+        this.subLayers[subLayer].plotting = ! this.subLayers[subLayer].plotting;
+        if(this.plottingAny()) {
             var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
             var endDate = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
             this.plotData(startDate, endDate);
         } else {
-            this.markers.clearLayers();
+            map.removeLayer(this.markers);
         }
     }
 
     plotData(timeStart, timeEnd){
-        if( this.plottingLayer ){
-            var that = this;
-            var timeSeriesMarkers = this.timeSeries.map(function (p) {
-                var indexStart = nodeIndexOfTime(p.time_series, timeStart);
-                var indexEnd = nodeIndexOfTime(p.time_series, timeEnd);
-                var count =  p.time_series[indexEnd].cases - p.time_series[indexStart].cases;
+        if( this.plottingAny() ){
+            for (var i = 0; i < this.timeSeriesMarkers.length; i++){
+                var m = this.timeSeriesMarkers[i];
+                var entryStart = m.time_series[nodeIndexOfTime(m.time_series, timeStart)]
+                var entryEnd = m.time_series[nodeIndexOfTime(m.time_series, timeEnd)];
 
-                var icon = that.layerIcon(count);
-                var marker = L.marker([p.lat, p.lng], {icon: icon});
-                marker.count = count;
-                return marker;
-            });
-            this.markers.clearLayers();
-            this.markers.addLayers(timeSeriesMarkers)
+                var confirmed = entryEnd.confirmed - entryStart.confirmed;
+                var deaths = entryEnd.deaths - entryStart.deaths;
+                var recoveries = entryEnd.recovered - entryStart.recovered;
+
+                var icon = this.layerIcon(confirmed, deaths, recoveries);
+                m.setIcon(icon)
+
+                m.confirmed = confirmed;
+                m.deaths = deaths;
+                m.recoveries = recoveries;
+
+                m.bindPopup("<ul><li>Confirmed: " + confirmed + "</li><li>Deaths: " + deaths  + "</li><li> Recoveries:" + recoveries + "</li></ul>");
+            }
+            this.markers.refreshClusters();
         }
     }
 
-    layerIcon(count) {
-        var size = markerSize(count);
-
-        var elemStyle =
+    layerIcon(confirmed, deaths, recovered) {
+        var confirmedSize = markerSize(confirmed);
+        var confirmedStyle =
+          'position: relative;' +
+          'font-weight: bolder;' + 
           'border-radius: 50%;' +
-          'width: '  + size + 'px;' +
-          'height: ' + size + 'px;' +
-          'line-height: ' + size + 'px;' +
-          'font-weight: bold;' +
-          'border: dashed ' + this.color + ';';
+          'line-height: '  + confirmedSize + 'px;' +
+          'width: '  + confirmedSize + 'px;' +
+          'height: ' + confirmedSize + 'px;';
 
-        if (count == 0) {
-            elemStyle += 'display: none;';
+        if(this.subLayers.confirmed.plotting) {
+            confirmedStyle += 'border: dashed black ;';
+        }
+
+        var deathsSize = markerSize(deaths);
+        var deathsStyle =
+          'position: absolute;' + 
+          'border-radius: 50%;' +
+          'top: 50%;' +
+          'left: 50%;' +
+          'margin: ' + (-deathsSize/2) +'px 0px 0px ' + (-deathsSize/2) + 'px;' +
+          'width: '  + deathsSize + 'px;' +
+          'height: ' + deathsSize + 'px;' +
+          'border: dashed red ;';
+
+        var recoveredSize = markerSize(recovered);
+        var recoveredStyle =
+          'position: absolute;' + 
+          'border-radius: 50%;' +
+          'top: 50%;' +
+          'left: 50%;' +
+          'margin: ' + (-recoveredSize/2) +'px 0px 0px ' + (-recoveredSize/2) + 'px;' +
+          'width: '  + recoveredSize + 'px;' +
+          'height: ' + recoveredSize + 'px;' +
+          'border: dashed green ;';
+
+        if ((confirmed + deaths + recovered) == 0) {
+            confirmedStyle += 'display: none;';
         }
 
         return new L.DivIcon({
-            html: '<div style="' + elemStyle + '">' + count + '</div>',
+            html: '<div style="' + confirmedStyle + '">' +
+                    (this.subLayers.deaths.plotting && deaths > 0 ? '<div style="' + deathsStyle + '"></div>' : '') +
+                    (this.subLayers.recoveries.plotting && recovered > 0 ? '<div style="' + recoveredStyle + '"></div>' : '') +
+                     //confirmed + "," + deaths + "," + recovered +
+                  '</div>',
             className: 'marker-cluster',
-            iconSize: new L.Point(size, size)
+            iconSize: new L.Point(confirmedSize, confirmedSize)
         });
     }
 }
 
 
 var confirmedCasesSelected = document.getElementById("confirmed_cases_checkbox").checked;
-var confirmedLayer = new JHUDataLayer('black', timeSeriesconfirmed, confirmedCasesSelected);
+//var confirmedLayer = new JHUDataLayer('black', timeSeriesconfirmed, confirmedCasesSelected);
 
 var deathsSelected = document.getElementById("deaths_checkbox").checked;
-var deathsLayer = new JHUDataLayer('red', timeSeriesdeaths, deathsSelected);
+//var deathsLayer = new JHUDataLayer('red', timeSeriesdeaths, deathsSelected);
 
 var recoveredSelected = document.getElementById("recovered_checkbox").checked;
-var recoveredLayer = new JHUDataLayer('green', timeSeriesrecovered, recoveredSelected);
+//var recoveredLayer = new JHUDataLayer('green', timeSeriesrecovered, recoveredSelected);
+
+var jhuLayer = new JHUDataLayer(confirmedCasesSelected, deathsSelected, recoveredSelected);
 
 var newsDataSelected = document.getElementById("news_data_checkbox").checked;
 var newsLayer = new NewsStandDataLayer(newsDataSelected,
@@ -305,7 +400,7 @@ var twitterLayer = new NewsStandDataLayer(twitterDataSelected,
       return url;
     });
 
-var dataLayers = [confirmedLayer, deathsLayer, recoveredLayer, newsLayer, twitterLayer];
+var dataLayers = [jhuLayer, newsLayer, twitterLayer];
 
 document.getElementById("end_date").valueAsDate = new Date();
 downloadData();
@@ -314,8 +409,11 @@ function downloadData() {
     twitterLayer.updateLayer();
     newsLayer.updateLayer();
 
-    var min = dateToEpochMins(document.getElementById("start_date").valueAsDate)
-    var max = dateToEpochMins(document.getElementById("end_date").valueAsDate)
+    dataStartDate = document.getElementById("start_date").valueAsDate;
+    dataEndDate = document.getElementById("end_date").valueAsDate;
+
+    var min = dateToEpochMins(dataStartDate)
+    var max = dateToEpochMins(dataEndDate)
 
     $("#slider-range").slider("option", "min", min);
     $("#slider-range").slider("option", "max", max);
@@ -367,7 +465,7 @@ function terminateAnimation() {
 }
 
 function markerSize(clusterSize) {
-  return 20 + Math.log(clusterSize)**2;
+  return 40 + Math.log(clusterSize)**2;
 }
 
 function dateToEpochMins(date) {
@@ -412,9 +510,10 @@ function setDisplayedDateRange(startMins, endMins) {
     // Update all layeres for new range
     newsLayer.plotData(startMins, endMins);
     twitterLayer.plotData(startMins, endMins);
-    confirmedLayer.plotData(startMins, endMins);
-    deathsLayer.plotData(startMins, endMins);
-    recoveredLayer.plotData(startMins, endMins);
+    jhuLayer.plotData(startMins, endMins);
+    //confirmedLayer.plotData(startMins, endMins);
+    //deathsLayer.plotData(startMins, endMins);
+    //recoveredLayer.plotData(startMins, endMins);
 }
 
 function setAnimateStep(step) {
