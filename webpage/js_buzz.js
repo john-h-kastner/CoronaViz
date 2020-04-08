@@ -109,21 +109,6 @@ class NewsStandDataLayer {
         if(this.plottingLayer){
           this.markers.addLayers(this.markerList);
         }
-
-        if(this.nodeList.length > 0) {
-          var min = this.nodeList[0].time;
-          var max = this.nodeList[this.nodeList.length - 1].time;
-
-          dataStartDate = epochMinsToDate(min);
-          dataEndDate = epochMinsToDate(max)
-
-          document.getElementById("start_date").valueAsDate = dataStartDate;
-          document.getElementById("end_date").valueAsDate = dataEndDate;
-          $("#slider-range").slider("option", "min", min);
-          $("#slider-range").slider("option", "max", max);
-
-          setDisplayedDateRange(min, max);
-        }
     }
 
     updateLayer() {
@@ -143,6 +128,7 @@ class NewsStandDataLayer {
             } else {
               console.error(xhr.statusText);
             }
+
             loader.style.display = 'none';
           }
         }
@@ -321,8 +307,21 @@ var twitterLayer = new NewsStandDataLayer(twitterDataSelected,
 
 var dataLayers = [confirmedLayer, deathsLayer, recoveredLayer, newsLayer, twitterLayer];
 
-newsLayer.updateLayer();
-twitterLayer.updateLayer();
+document.getElementById("end_date").valueAsDate = new Date();
+downloadData();
+
+function downloadData() {
+    twitterLayer.updateLayer();
+    newsLayer.updateLayer();
+
+    var min = dateToEpochMins(document.getElementById("start_date").valueAsDate)
+    var max = dateToEpochMins(document.getElementById("end_date").valueAsDate)
+
+    $("#slider-range").slider("option", "min", min);
+    $("#slider-range").slider("option", "max", max);
+
+    setDisplayedDateRange(min, max);
+}
 
 //TODO: make this a binary search since that's definitely more efficient. To bad
 // I'm too lazy to do it right the first time. Well, it seems to work as is,
