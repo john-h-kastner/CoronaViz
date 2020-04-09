@@ -178,19 +178,10 @@ class JHUDataLayer {
     constructor(plottingConfirmed, plottingDeaths, plottingRecoveries) {
         this.timeSeries = jhuData;
         this.subLayers = {
-            confirmed: {
-                color: 'black',
-                plotting: plottingConfirmed
-            },
-            deaths: {
-                color: 'red',
-                plotting: plottingDeaths
-            },
-            recoveries: {
-                color: 'green',
-                plotting: plottingRecoveries
-            }
-        }
+            confirmed: { plotting: plottingConfirmed },
+            deaths: { plotting: plottingDeaths },
+            recoveries: { plotting: plottingRecoveries }
+        };
 
         var that = this;
         this.markers = L.markerClusterGroup({
@@ -215,7 +206,7 @@ class JHUDataLayer {
 
             that.clusterPopup = L.popup()
               .setLatLng(a.layer.getLatLng())
-              .setContent("<ul><li>Confirmed: " + confirmed + "</li><li>Deaths: " + deaths  + "</li><li> Recoveries:" + recoveries + "</li></ul>")
+              .setContent(that.popupText(confirmed, deaths, recoveries))
               .openOn(map);
         });
         this.markers.on('clustermouseout', function (a) {
@@ -227,7 +218,7 @@ class JHUDataLayer {
         map.addLayer(this.markers);
 
         this.timeSeriesMarkers = this.timeSeries.map(function (p) {
-            var marker = L.marker([p.lat, p.lng]);
+            var marker = L.marker([p.lat, p.lng], {icon: L.divIcon({className: 'test'})});
             marker.time_series = p.time_series;
             marker.on('mouseover', function(e) {
                 this.openPopup();
@@ -282,10 +273,18 @@ class JHUDataLayer {
                 m.deaths = deaths;
                 m.recoveries = recoveries;
 
-                m.bindPopup("<ul><li>Confirmed: " + confirmed + "</li><li>Deaths: " + deaths  + "</li><li> Recoveries:" + recoveries + "</li></ul>");
+                m.bindPopup(this.popupText(confirmed, deaths, recoveries));
             }
             this.markers.refreshClusters();
         }
+    }
+
+    popupText(confirmed, deaths, recoveries) {
+      return "<ul>" +
+               "<li>Confirmed: " + confirmed + "</li>" +
+               "<li>Deaths: " + deaths  + "</li>" +
+               "<li> Recoveries:" + recoveries + "</li>" +
+             "</ul>";
     }
 
     layerIcon(confirmed, deaths, recovered) {
@@ -332,7 +331,6 @@ class JHUDataLayer {
             html: '<div style="' + confirmedStyle + '">' +
                     (this.subLayers.deaths.plotting && deaths > 0 ? '<div style="' + deathsStyle + '"></div>' : '') +
                     (this.subLayers.recoveries.plotting && recovered > 0 ? '<div style="' + recoveredStyle + '"></div>' : '') +
-                     //confirmed + "," + deaths + "," + recovered +
                   '</div>',
             className: 'marker-cluster',
             iconSize: new L.Point(confirmedSize, confirmedSize)
@@ -340,16 +338,9 @@ class JHUDataLayer {
     }
 }
 
-
 var confirmedCasesSelected = document.getElementById("confirmed_cases_checkbox").checked;
-//var confirmedLayer = new JHUDataLayer('black', timeSeriesconfirmed, confirmedCasesSelected);
-
 var deathsSelected = document.getElementById("deaths_checkbox").checked;
-//var deathsLayer = new JHUDataLayer('red', timeSeriesdeaths, deathsSelected);
-
 var recoveredSelected = document.getElementById("recovered_checkbox").checked;
-//var recoveredLayer = new JHUDataLayer('green', timeSeriesrecovered, recoveredSelected);
-
 var jhuLayer = new JHUDataLayer(confirmedCasesSelected, deathsSelected, recoveredSelected);
 
 var newsDataSelected = document.getElementById("news_data_checkbox").checked;
@@ -511,9 +502,6 @@ function setDisplayedDateRange(startMins, endMins) {
     newsLayer.plotData(startMins, endMins);
     twitterLayer.plotData(startMins, endMins);
     jhuLayer.plotData(startMins, endMins);
-    //confirmedLayer.plotData(startMins, endMins);
-    //deathsLayer.plotData(startMins, endMins);
-    //recoveredLayer.plotData(startMins, endMins);
 }
 
 function setAnimateStep(step) {
