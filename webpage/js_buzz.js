@@ -36,6 +36,8 @@ var animateSpeed = 100;
 var cumulativeAnimation = document.getElementById("cumulative_animation").checked;
 document.getElementById("animate_window").disabled = cumulativeAnimation;
 
+var animation_paused = false;
+
 class NewsStandDataLayer {
     constructor(plottingLayer, color_fn, url_fn) {
         var that = this;
@@ -432,10 +434,24 @@ function nodeIndexOfTime(list, time) {
 var animating = false;
 async function animateMarkers() {
   if (!animating) {
-    document.getElementById("animate").innerHTML = 'Stop Animation';
+    document.getElementById("animate").innerHTML = 'Pause Animation';
     animating = true;
-    var start = dateToEpochMins(dataStartDate);
-    for (var i = start; animating && i < dateToEpochMins(dataEndDate) - animateWindow; i+=animateStep) {
+
+    var start;
+    var i;
+    if(animation_paused) {
+        if(cumulativeAnimation) {
+            start = dateToEpochMins(dataStartDate);
+            i = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
+        } else {
+            start = dateToEpochMins(document.getElementById("display_start_date").valueAsDate)
+            i = start;
+        }
+    } else {
+        start = dateToEpochMins(dataStartDate);
+        i = start
+    }
+    for (;animating && i < dateToEpochMins(dataEndDate) - animateWindow; i+=animateStep) {
 
       if(cumulativeAnimation){
         setDisplayedDateRange(start, i+animateWindow);
@@ -445,13 +461,25 @@ async function animateMarkers() {
 
       await new Promise(r => setTimeout(r, animateSpeed));
     }
+    if(animating){
+        terminateAnimation();
+    }
+  } else {
+    pauseAnimation();
   }
-  terminateAnimation();
+}
+
+function pauseAnimation() {
+    console.log('pause');
+    animating = false;
+    animation_paused = true;
+    document.getElementById("animate").innerHTML = 'Resume Animation &raquo;';
 }
 
 // Since I'm doing a bit of a hack here, the least I can do is hide it in function.
 function terminateAnimation() {
     animating = false;
+    animation_paused = false;
     document.getElementById("animate").innerHTML = 'Start Animation &raquo;';
 }
 
