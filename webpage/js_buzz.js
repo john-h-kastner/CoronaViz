@@ -177,12 +177,13 @@ class NewsStandDataLayer {
 }
 
 class JHUDataLayer {
-    constructor(plottingConfirmed, plottingDeaths, plottingRecoveries) {
+    constructor(plottingConfirmed, plottingDeaths, plottingRecoveries, plottingActive) {
         this.timeSeries = jhuData;
         this.subLayers = {
             confirmed: { plotting: plottingConfirmed },
             deaths: { plotting: plottingDeaths },
-            recoveries: { plotting: plottingRecoveries }
+            recoveries: { plotting: plottingRecoveries },
+            active: {plotting:  plottingActive }
         };
 
         var that = this;
@@ -281,11 +282,16 @@ class JHUDataLayer {
         }
     }
 
+    computeActive(confirmed, deaths, recoveries) {
+        return confirmed - (deaths + recoveries);
+    }
+
     popupText(confirmed, deaths, recoveries) {
       return "<ul>" +
                "<li>Confirmed: " + confirmed + "</li>" +
                "<li>Deaths: " + deaths  + "</li>" +
-               "<li> Recoveries:" + recoveries + "</li>" +
+               "<li>Recoveries:" + recoveries + "</li>" +
+               "<li>Active:" + this.computeActive(confirmed, deaths, recoveries) + "</li>" +
              "</ul>";
     }
 
@@ -293,7 +299,7 @@ class JHUDataLayer {
         var confirmedSize = markerSize(confirmed);
         var confirmedStyle =
           'position: relative;' +
-          'font-weight: bolder;' + 
+          'font-weight: bolder;' +
           'border-radius: 50%;' +
           'line-height: '  + confirmedSize + 'px;' +
           'width: '  + confirmedSize + 'px;' +
@@ -305,7 +311,7 @@ class JHUDataLayer {
 
         var deathsSize = markerSize(deaths);
         var deathsStyle =
-          'position: absolute;' + 
+          'position: absolute;' +
           'border-radius: 50%;' +
           'top: 50%;' +
           'left: 50%;' +
@@ -316,7 +322,7 @@ class JHUDataLayer {
 
         var recoveredSize = markerSize(recovered);
         var recoveredStyle =
-          'position: absolute;' + 
+          'position: absolute;' +
           'border-radius: 50%;' +
           'top: 50%;' +
           'left: 50%;' +
@@ -324,6 +330,18 @@ class JHUDataLayer {
           'width: '  + recoveredSize + 'px;' +
           'height: ' + recoveredSize + 'px;' +
           'border: dashed green ;';
+
+        var active = this.computeActive(confirmed, deaths, recovered);
+        var activeSize = markerSize(active);
+        var activeStyle =
+          'position: absolute;' +
+          'border-radius: 50%;' +
+          'top: 50%;' +
+          'left: 50%;' +
+          'margin: ' + (-activeSize/2) +'px 0px 0px ' + (-activeSize/2) + 'px;' +
+          'width: '  + activeSize + 'px;' +
+          'height: ' + activeSize + 'px;' +
+          'border: dashed yellow ;';
 
         if ((confirmed + deaths + recovered) == 0) {
             confirmedStyle += 'display: none;';
@@ -333,6 +351,7 @@ class JHUDataLayer {
             html: '<div style="' + confirmedStyle + '">' +
                     (this.subLayers.deaths.plotting && deaths > 0 ? '<div style="' + deathsStyle + '"></div>' : '') +
                     (this.subLayers.recoveries.plotting && recovered > 0 ? '<div style="' + recoveredStyle + '"></div>' : '') +
+                    (this.subLayers.active.plotting && active > 0 ? '<div style="' + activeStyle + '"></div>' : '') +
                   '</div>',
             className: 'marker-cluster',
             iconSize: new L.Point(confirmedSize, confirmedSize)
@@ -343,7 +362,8 @@ class JHUDataLayer {
 var confirmedCasesSelected = document.getElementById("confirmed_cases_checkbox").checked;
 var deathsSelected = document.getElementById("deaths_checkbox").checked;
 var recoveredSelected = document.getElementById("recovered_checkbox").checked;
-var jhuLayer = new JHUDataLayer(confirmedCasesSelected, deathsSelected, recoveredSelected);
+var activeSelected = document.getElementById("active_checkbox").checked;
+var jhuLayer = new JHUDataLayer(confirmedCasesSelected, deathsSelected, recoveredSelected, activeSelected);
 
 var newsDataSelected = document.getElementById("news_data_checkbox").checked;
 var newsLayer = new NewsStandDataLayer(newsDataSelected,
