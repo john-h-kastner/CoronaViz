@@ -564,3 +564,23 @@ function toggleCumulative() {
     cumulativeAnimation = ! cumulativeAnimation;
     document.getElementById("animate_window").disabled = cumulativeAnimation;
 }
+
+function stepForward() {
+    var current_end = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
+    current_end += animateStep;
+    var current_start = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
+    if(!cumulativeAnimation){
+        current_start += animateStep;
+    }
+    setDisplayedDateRange(current_start, current_end);
+}
+
+function stepBack() {
+    var current_end = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
+    current_end -= animateStep;
+    var current_start = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
+    if(!cumulativeAnimation){
+        current_start -= animateStep;
+    }
+    setDisplayedDateRange(current_start, current_end);
+}
