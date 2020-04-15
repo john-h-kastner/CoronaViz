@@ -102,7 +102,7 @@ span.line {
   }
 }
 
-.circle:hover > .circle, .circle:hover {
+.selected  .circle {
     border-width: 5px !important;
 }
 

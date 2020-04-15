@@ -221,30 +221,47 @@ class JHUDataLayer {
                 return that.layerIcon(confirmed, deaths, recoveries, active);
             }
         });
-        this.markers.on('clustermouseover', function (a) {
+        map.addLayer(this.markers);
+
+        var selected_marker = undefined;
+        this.markers.on('clustermouseover clustermousedown', function (a) {
+            if (selected_marker && selected_marker._icon) {
+                selected_marker._icon.classList.remove('selected');
+            }
             var confirmed = a.layer.getAllChildMarkers().reduce((a,v) => a + v.confirmed, 0)
             var deaths = a.layer.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0)
             var recoveries = a.layer.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0)
             var active = a.layer.getAllChildMarkers().reduce((a,v) => a + v.active, 0)
             info.update(confirmed, deaths, recoveries, active);
+            a.layer._icon.classList.add('selected');
+            selected_marker = a.layer;
+
         });
         this.markers.on('clustermouseout', function (a) {
             info.clear();
+            a.layer._icon.classList.remove('selected');
+            selected_marker = undefined;
         });
-        map.addLayer(this.markers);
-
         this.timeSeriesMarkers = this.timeSeries.map(function (p) {
             var marker = L.marker([p.lat, p.lng], {icon: L.divIcon({className: 'test'})});
             marker.name = p.name;
             marker.time_series = p.time_series;
-            marker.on('mouseover', function(e) {
+            marker.on('mouseover click', function(e) {
+                if (selected_marker && selected_marker._icon) {
+                    selected_marker._icon.classList.remove('selected');
+                }
                 info.update(marker.confirmed, marker.deaths, marker.recoveries, marker.active, marker.name);
+                marker._icon.classList.add('selected');
+                selected_marker = marker;
             });
             marker.on('mouseout', function(e) {
                 info.clear();
+                marker._icon.classList.remove('selected');
+                selected_marker = undefined;
             });
             return marker;
         });
+
         this.markers.clearLayers();
         this.markers.addLayers(this.timeSeriesMarkers)
 
