@@ -222,6 +222,7 @@ class JHUDataLayer {
 
         this.timeSeriesMarkers = this.timeSeries.map(function (p) {
             var marker = L.marker([p.lat, p.lng], {icon: L.divIcon({className: 'test'})});
+            marker.name = p.name;
             marker.time_series = p.time_series;
             marker.on('mouseover', function(e) {
                 this.openPopup();
@@ -276,7 +277,7 @@ class JHUDataLayer {
                 m.deaths = deaths;
                 m.recoveries = recoveries;
 
-                m.bindPopup(this.popupText(confirmed, deaths, recoveries));
+                m.bindPopup(this.popupText(confirmed, deaths, recoveries, m.name));
             }
             this.markers.refreshClusters();
         }
@@ -286,8 +287,9 @@ class JHUDataLayer {
         return confirmed - (deaths + recoveries);
     }
 
-    popupText(confirmed, deaths, recoveries) {
-      return "<ul>" +
+    popupText(confirmed, deaths, recoveries, placename) {
+      return (placename != undefined ? "<em>" + placename + "</em><br>" : "") +
+            "<ul>" +
                "<li>Confirmed: " + confirmed + "</li>" +
                "<li>Deaths: " + deaths  + "</li>" +
                "<li>Recoveries:" + recoveries + "</li>" +
@@ -306,7 +308,7 @@ class JHUDataLayer {
           'height: ' + confirmedSize + 'px;';
 
         if(this.subLayers.confirmed.plotting) {
-            confirmedStyle += 'border: dashed black ;';
+            confirmedStyle += 'border: dotted black ;';
         }
 
         var deathsSize = markerSize(deaths);
@@ -318,7 +320,7 @@ class JHUDataLayer {
           'margin: ' + (-deathsSize/2) +'px 0px 0px ' + (-deathsSize/2) + 'px;' +
           'width: '  + deathsSize + 'px;' +
           'height: ' + deathsSize + 'px;' +
-          'border: dashed red ;';
+          'border: dotted red ;';
 
         var recoveredSize = markerSize(recovered);
         var recoveredStyle =
@@ -329,7 +331,7 @@ class JHUDataLayer {
           'margin: ' + (-recoveredSize/2) +'px 0px 0px ' + (-recoveredSize/2) + 'px;' +
           'width: '  + recoveredSize + 'px;' +
           'height: ' + recoveredSize + 'px;' +
-          'border: dashed green ;';
+          'border: dotted green ;';
 
         var active = this.computeActive(confirmed, deaths, recovered);
         var activeSize = markerSize(active);
@@ -341,7 +343,7 @@ class JHUDataLayer {
           'margin: ' + (-activeSize/2) +'px 0px 0px ' + (-activeSize/2) + 'px;' +
           'width: '  + activeSize + 'px;' +
           'height: ' + activeSize + 'px;' +
-          'border: dashed yellow ;';
+          'border: dotted orange ;';
 
         if ((confirmed + deaths + recovered) == 0) {
             confirmedStyle += 'display: none;';

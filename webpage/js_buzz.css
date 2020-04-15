@@ -133,19 +133,19 @@ span.line {
 }
 
 .circle_confirmed_small, .circle_confirmed_med, .circle_confirmed_large {
-  border: dashed black;
+  border: dotted black;
 }
 
 .circle_deaths_small, .circle_deaths_med, .circle_deaths_large {
-  border: dashed red;
+  border: dotted red;
 }
 
 .circle_recovered_small, .circle_recovered_med, .circle_recovered_large {
-  border: dashed green;
+  border: dotted green;
 }
 
 .circle_active_small, .circle_active_med, .circle_active_large {
-  border: dashed yellow;
+  border: dotted orange;
 }
 
 .circle_twitter_small, .circle_twitter_med, .circle_twitter_large {

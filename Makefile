@@ -6,11 +6,11 @@ WEBPAGE_DIR = webpage
 WEBPAGE_BASENAMES = index.html js_buzz.js js_buzz.css
 WEBPAGE_SRC_FILES = $(addprefix $(WEBPAGE_DIR)/,$(WEBPAGE_BASENAMES))
 
-jhu_data.js: convert_data.py
+$(WEBPAGE_DIR)/jhu_data.js: convert_data.py
 	python convert_data.py
 
 deploy: .deploy
-.deploy: $(WEBPAGE_SRC_FILES) jhu_data.js
+.deploy: $(WEBPAGE_SRC_FILES) $(WEBPAGE_DIR)/jhu_data.js
 	cd $(WEBPAGE_DIR) ; $(foreach BUCKET, $(BUCKETS), syncobj -r -m . $(BUCKET): ;)
 	@touch .deploy
 
