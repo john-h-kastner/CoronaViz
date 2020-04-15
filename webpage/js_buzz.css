@@ -102,6 +102,24 @@ span.line {
   }
 }
 
+.circle:hover > .circle, .circle:hover {
+    border-width: 5px !important;
+}
+
+.info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+
+.info h4 {
+    margin: 0 0 5px;
+    color: #777;
+}
+
 .circle_active_small, .circle_active_med, .circle_active_large,
 .circle_twitter_small, .circle_twitter_med, .circle_twitter_large,
 .circle_recovered_small, .circle_recovered_med, .circle_recovered_large,

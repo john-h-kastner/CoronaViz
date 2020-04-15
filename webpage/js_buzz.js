@@ -11,6 +11,28 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
     id: 'mapbox.streets',
 }).addTo(map);
 
+
+var info = L.control();
+
+info.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'info');
+    this.clear();
+    return this._div;
+};
+
+info.update = function (confirmed, deaths, recoveries, active, placename) {
+    this._div.innerHTML = (placename != undefined ? "<b>" + placename + "</b><br>" : "") +
+               "Confirmed: " + confirmed + "</br>" +
+               "Deaths: " + deaths  + "<br>" +
+               "Recoveries:" + recoveries + "<br>" +
+               "Active:" + active + "<br>";
+};
+info.clear = function () {
+    this._div.innerHTML = "Hover over marker";
+}
+
+info.addTo(map);
+
 $( "#slider-range" ).slider({
   range: true,
   min: 0,
@@ -195,28 +217,19 @@ class JHUDataLayer {
                 var confirmed = cluster.getAllChildMarkers().reduce((a,v) => a + v.confirmed, 0)
                 var deaths = cluster.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0)
                 var recoveries = cluster.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0)
-                return that.layerIcon(confirmed, deaths, recoveries);
+                var active = that.computeActive(confirmed, deaths, recoveries);
+                return that.layerIcon(confirmed, deaths, recoveries, active);
             }
         });
-        this.clusterPopup = undefined;
         this.markers.on('clustermouseover', function (a) {
-            if (that.clusterPopup != undefined) {
-                map.closePopup();
-            }
             var confirmed = a.layer.getAllChildMarkers().reduce((a,v) => a + v.confirmed, 0)
             var deaths = a.layer.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0)
             var recoveries = a.layer.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0)
-
-            that.clusterPopup = L.popup()
-              .setLatLng(a.layer.getLatLng())
-              .setContent(that.popupText(confirmed, deaths, recoveries))
-              .openOn(map);
+            var active = a.layer.getAllChildMarkers().reduce((a,v) => a + v.active, 0)
+            info.update(confirmed, deaths, recoveries, active);
         });
         this.markers.on('clustermouseout', function (a) {
-            if (that.clusterPopup != undefined) {
-                map.closePopup();
-            }
-            that.clusterPopup = undefined;
+            info.clear();
         });
         map.addLayer(this.markers);
 
@@ -225,10 +238,10 @@ class JHUDataLayer {
             marker.name = p.name;
             marker.time_series = p.time_series;
             marker.on('mouseover', function(e) {
-                this.openPopup();
+                info.update(marker.confirmed, marker.deaths, marker.recoveries, marker.active, marker.name);
             });
             marker.on('mouseout', function(e) {
-                this.closePopup();
+                info.clear();
             });
             return marker;
         });
@@ -269,15 +282,15 @@ class JHUDataLayer {
                 var confirmed = entryEnd.confirmed - entryStart.confirmed;
                 var deaths = entryEnd.deaths - entryStart.deaths;
                 var recoveries = entryEnd.recovered - entryStart.recovered;
+                var active = this.computeActive(confirmed, deaths, recoveries);
 
-                var icon = this.layerIcon(confirmed, deaths, recoveries);
+                var icon = this.layerIcon(confirmed, deaths, recoveries, active);
                 m.setIcon(icon)
 
                 m.confirmed = confirmed;
                 m.deaths = deaths;
                 m.recoveries = recoveries;
-
-                m.bindPopup(this.popupText(confirmed, deaths, recoveries, m.name));
+                m.active = active;
             }
             this.markers.refreshClusters();
         }
@@ -287,17 +300,7 @@ class JHUDataLayer {
         return confirmed - (deaths + recoveries);
     }
 
-    popupText(confirmed, deaths, recoveries, placename) {
-      return (placename != undefined ? "<em>" + placename + "</em><br>" : "") +
-            "<ul>" +
-               "<li>Confirmed: " + confirmed + "</li>" +
-               "<li>Deaths: " + deaths  + "</li>" +
-               "<li>Recoveries:" + recoveries + "</li>" +
-               "<li>Active:" + this.computeActive(confirmed, deaths, recoveries) + "</li>" +
-             "</ul>";
-    }
-
-    layerIcon(confirmed, deaths, recovered) {
+    layerIcon(confirmed, deaths, recovered, active) {
         var confirmedSize = markerSize(confirmed);
         var confirmedStyle =
           'position: relative;' +
@@ -333,7 +336,6 @@ class JHUDataLayer {
           'height: ' + recoveredSize + 'px;' +
           'border: dotted green ;';
 
-        var active = this.computeActive(confirmed, deaths, recovered);
         var activeSize = markerSize(active);
         var activeStyle =
           'position: absolute;' +
@@ -350,10 +352,10 @@ class JHUDataLayer {
         }
 
         return new L.DivIcon({
-            html: '<div style="' + confirmedStyle + '">' +
-                    (this.subLayers.deaths.plotting && deaths > 0 ? '<div style="' + deathsStyle + '"></div>' : '') +
-                    (this.subLayers.recoveries.plotting && recovered > 0 ? '<div style="' + recoveredStyle + '"></div>' : '') +
-                    (this.subLayers.active.plotting && active > 0 ? '<div style="' + activeStyle + '"></div>' : '') +
+            html: '<div class="circle" style="' + confirmedStyle + '">' +
+                    (this.subLayers.deaths.plotting && deaths > 0 ? '<div class="circle" style="' + deathsStyle + '"></div>' : '') +
+                    (this.subLayers.recoveries.plotting && recovered > 0 ? '<div class="circle" style="' + recoveredStyle + '"></div>' : '') +
+                    (this.subLayers.active.plotting && active > 0 ? '<div class="circle" style="' + activeStyle + '"></div>' : '') +
                   '</div>',
             className: 'marker-cluster',
             iconSize: new L.Point(confirmedSize, confirmedSize)
