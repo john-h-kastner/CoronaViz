@@ -49,6 +49,15 @@ $( "#slider-range" ).slider({
   }
 });
 
+var country_select = document.getElementById("country_select");
+for (var key of Object.keys(bounding_boxes)) {
+    var option = document.createElement("option");
+    var textnode = document.createTextNode(bounding_boxes[key][0]);
+    option.appendChild(textnode);
+    option.value = key;
+    country_select.appendChild(option);
+}
+
 var dataStartDate;
 var dataEndDate;
 
@@ -604,4 +613,9 @@ function stepBack() {
         current_start -= animateStep;
     }
     setDisplayedDateRange(current_start, current_end);
+}
+
+function setCountryView(country_code) {
+    bb = bounding_boxes[country_code][1];
+    map.fitBounds([[bb[1], bb[0]], [bb[3], bb[2]]]);
 }

@@ -241,6 +241,11 @@
 
       <div>
         <h2>Animation Controls</h2>
+        <span class="line">
+            <label for="country_select">View Country:</label>
+            <select id="country_select" onchange="setCountryView(this.value)"></select>
+        </span>
+        <br>
 
         <span class="line">
         <label for="animate_window">Animation Window:</label>
@@ -359,6 +364,7 @@
 <script src="time_series_19-covid-recovered.js"></script>-->
 
 <script src="jhu_data.js"></script>
+<script src="bounding-boxes.js"></script>
 <script src="js_buzz.js"></script>
 </body>
 </html>
