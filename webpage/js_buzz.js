@@ -50,9 +50,12 @@ $( "#slider-range" ).slider({
 });
 
 var country_select = document.getElementById("country_select");
-for (var key of Object.keys(bounding_boxes)) {
+var sorted_options =  Object.entries(bounding_boxes).sort(function(a,b) { return a[1][0].localeCompare(b[1][0])});
+for (var e of sorted_options) {
+    var key = e[0];
+    var label = e[1][0];
     var option = document.createElement("option");
-    var textnode = document.createTextNode(bounding_boxes[key][0]);
+    var textnode = document.createTextNode(label);
     option.appendChild(textnode);
     option.value = key;
     country_select.appendChild(option);
