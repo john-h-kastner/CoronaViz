@@ -245,7 +245,6 @@ class JHUDataLayer {
                 return that.layerIcon(confirmed, deaths, recoveries, active);
             }
         });
-        map.addLayer(this.markers);
 
         var selected_marker = undefined;
         this.markers.on('clustermouseover clustermousedown', function (a) {
@@ -269,7 +268,7 @@ class JHUDataLayer {
             selected_marker = undefined;
         });
         this.timeSeriesMarkers = this.timeSeries.map(function (p) {
-            var marker = L.marker([p.lat, p.lng], {icon: L.divIcon({className: 'test'})});
+            var marker = L.marker([p.lat, p.lng]);
             marker.name = p.name;
             marker.time_series = p.time_series;
             marker.on('mouseover click', function(e) {
