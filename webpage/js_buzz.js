@@ -20,7 +20,7 @@ info.update = function (confirmed, deaths, recoveries, active, placenames) {
         var truncated = false;
         placenames = placenames.reduce(function (names_str,next) {
             var new_names_str = names_str + next + "; ";
-            if (new_names_str.length <=  50){
+            if (new_names_str.length <= 100){
                 return new_names_str;
             } else {
                 truncated = true;
@@ -256,7 +256,7 @@ class JHUDataLayer {
             var deaths = a.layer.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0);
             var recoveries = a.layer.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0);
             var active = a.layer.getAllChildMarkers().reduce((a,v) => a + v.active, 0);
-            var names = a.layer.getAllChildMarkers().map((v) => v.name);
+            var names = a.layer.getAllChildMarkers().slice().sort((a,b) => a.confirmed - b.confirmed).reverse().map((v) => v.name);
 
             info.update(confirmed, deaths, recoveries, active, names);
             a.layer._icon.classList.add('selected');
