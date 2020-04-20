@@ -102,6 +102,12 @@ span.line {
   }
 }
 
+@media (max-width: 361px) {
+  #coronaviz_brand {
+      font-size: 1rem;
+  }
+}
+
 .selected  .circle {
     border-width: 5px !important;
 }
