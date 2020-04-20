@@ -1,16 +1,11 @@
 var map = L.map('map', {'worldCopyJump': true}).setView([0,0], 2);
 
-
-var attribution = 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-                  '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a> | ' +
-                  'Imagery &copy; <a href="https://www.mapbox.com/">Mapbox</a>';
-
-L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiamFja2FzdG5lciIsImEiOiJjamx2bzhmc2YweTAxM2xxcGtqcHJtN3pkIn0.YKUh0QLQT_GHHVMdAyS-Mg',{
-    attribution: attribution,
-    maxZoom: 20,
-    id: 'mapbox.streets',
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}' + (L.Browser.retina ? '@2x.png' : '.png'), {
+   attribution:'&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
+   subdomains: 'abcd',
+   maxZoom: 20,
+   minZoom: 0
 }).addTo(map);
-
 
 var info = L.control();
 
