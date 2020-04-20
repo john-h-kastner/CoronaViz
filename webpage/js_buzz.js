@@ -20,8 +20,25 @@ info.onAdd = function (map) {
     return this._div;
 };
 
-info.update = function (confirmed, deaths, recoveries, active, placename) {
-    this._div.innerHTML = (placename != undefined ? "<b>" + placename + "</b><br>" : "") +
+info.update = function (confirmed, deaths, recoveries, active, placenames) {
+    if(Array.isArray(placenames)) {
+        var truncated = false;
+        placenames = placenames.reduce(function (names_str,next) {
+            var new_names_str = names_str + next + "; ";
+            if (new_names_str.length <=  50){
+                return new_names_str;
+            } else {
+                truncated = true;
+                return names_str;
+            }
+        },"");
+        if (truncated) {
+            placenames = placenames + "etc.";
+        } else {
+            placenames = placenames.substring(0, placenames.length-2);
+        }
+    }
+    this._div.innerHTML = (placenames != undefined ? "<b>" + placenames + "</b><br>" : "") +
                "Confirmed: " + confirmed + "</br>" +
                "Deaths: " + deaths  + "<br>" +
                "Recoveries:" + recoveries + "<br>" +
@@ -226,9 +243,9 @@ class JHUDataLayer {
             showCoverageOnHover: false,
             zoomToBoundsOnClick: false,
             iconCreateFunction: function(cluster) {
-                var confirmed = cluster.getAllChildMarkers().reduce((a,v) => a + v.confirmed, 0)
-                var deaths = cluster.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0)
-                var recoveries = cluster.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0)
+                var confirmed = cluster.getAllChildMarkers().reduce((a,v) => a + v.confirmed, 0);
+                var deaths = cluster.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0);
+                var recoveries = cluster.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0);
                 var active = that.computeActive(confirmed, deaths, recoveries);
                 return that.layerIcon(confirmed, deaths, recoveries, active);
             }
@@ -240,11 +257,13 @@ class JHUDataLayer {
             if (selected_marker && selected_marker._icon) {
                 selected_marker._icon.classList.remove('selected');
             }
-            var confirmed = a.layer.getAllChildMarkers().reduce((a,v) => a + v.confirmed, 0)
-            var deaths = a.layer.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0)
-            var recoveries = a.layer.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0)
-            var active = a.layer.getAllChildMarkers().reduce((a,v) => a + v.active, 0)
-            info.update(confirmed, deaths, recoveries, active);
+            var confirmed = a.layer.getAllChildMarkers().reduce((a,v) => a + v.confirmed, 0);
+            var deaths = a.layer.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0);
+            var recoveries = a.layer.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0);
+            var active = a.layer.getAllChildMarkers().reduce((a,v) => a + v.active, 0);
+            var names = a.layer.getAllChildMarkers().map((v) => v.name);
+
+            info.update(confirmed, deaths, recoveries, active, names);
             a.layer._icon.classList.add('selected');
             selected_marker = a.layer;
 
