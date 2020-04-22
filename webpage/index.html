@@ -65,7 +65,7 @@
         <a class="nav-link" href="https://github.com/jackastner/CoronaViz">GitHub</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="test.html">Extened Dataset Demo</a>
+        <a class="nav-link" href="test.html">Extended Dataset Demo</a>
       </li>
     </ul>
   </div>
@@ -86,7 +86,7 @@
         NewsStand CoronaViz is a research prototype that enables the dynamic
         map visualization of COVID-19
         related variables including the number of infections, active cases,
-        recoveries, and deaths all on a daily basis from the Johns Hopkins Unversity web site
+        recoveries, and deaths all on a daily basis from the Johns Hopkins University web site
         at <a href="https://coronavirus.jhu.edu/map.html">https://coronavirus.jhu.edu/map.html</a>, as well as mentions in news articles and
         tweets as they occur, by allowing the underlying spatial region and the
         spanned time interval to vary.  Any combination of the variables can be
@@ -110,7 +110,7 @@
         time to be better prepared to anticipate its emergence in new
         regions. There exist numerous systems to monitor and map officially
         released numbers of cases [1] which are the current established means
-        of keeping track of the progress of the virus. however, these systems
+        of keeping track of the progress of the virus. However, these systems
         do not necessarily paint a complete picture. For example, they are
         primarily mashups in that they do not support zooming in on the map in
         the sense that they just increase the resolution of the map but do not
@@ -139,7 +139,7 @@
 
         <p>
         NewsStand CoronaViz makes use of NewsStand to find all news articles
-        and tweets (identified by containing a pointer to a url of an RSS
+        and tweets (identified by containing a pointer to a URL of an RSS
         feed) that contain the keyword (COVID-19 or Coronavirus in our
         case). It also identifies each toponym (geographic location) that is
         mentioned in the article or tweet. Next, it takes the cross product of
@@ -210,7 +210,7 @@
        <p>
          <span class="line">
          <input type="date" id="display_start_date" readonly style="border:0">
-         -
+         
          <input type="date" id="display_end_date" readonly style="border:0">
          </span>
        </p>
@@ -255,8 +255,9 @@
         <select id="animate_window" onchange="setAnimateWindow(this.value)">
           <option value="60">Hour</option>
           <option value="1140">Day</option>
-          <option value="10080" selected>Week</option>
+          <option value="10080">Week</option>
           <option value="43200">Month</option>
+          <option value="max" selected>Maximum</option>
           <option disabled>Custom</option>
         </select>
         </span>

@@ -40,7 +40,7 @@ info.update = function (confirmed, deaths, recoveries, active, placenames) {
                "Active:" + active + "<br>";
 };
 info.clear = function () {
-    this._div.innerHTML = "Hover over marker";
+    this._div.innerHTML = "Hover over or click marker";
 }
 
 info.addTo(map);
@@ -578,11 +578,18 @@ function updateProgressBar(processed, total, elapsed, layersArray) {
 }
 
 function setAnimateWindow(size) {
-    animateWindow = parseInt(size);
-
-    var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
-    var endDate = startDate + animateWindow;
-
+    var startDate;
+    var endDate;
+    if (size == "max") {
+        console.log('max')
+        startDate = dateToEpochMins(document.getElementById("start_date").valueAsDate);
+        endDate = dateToEpochMins(document.getElementById("end_date").valueAsDate);
+        animateWindow = endDate - startDate;
+    } else {
+        animateWindow = parseInt(size);
+        startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
+        endDate = startDate + animateWindow;
+    }
     setDisplayedDateRange(startDate, endDate);
 }
 
