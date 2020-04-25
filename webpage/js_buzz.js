@@ -575,7 +575,7 @@ function terminateAnimation() {
 }
 
 function markerSize(clusterSize) {
-  return 40 + Math.log(clusterSize)**2;
+  return 40 + Math.log(2*clusterSize)**2;
 }
 
 function dateToEpochMins(date) {
