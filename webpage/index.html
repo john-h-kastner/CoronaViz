@@ -3,6 +3,9 @@
 <head>
     <title>NewsStand CoronaViz</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta http-equiv='cache-control' content='no-cache'>
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
 
     <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
@@ -301,6 +304,16 @@
       </div>
 
       <div>
+        <h2> Location Data Values </h2>
+        Location: <span id="sidebar_location"></span><br>
+        Confirmed: <span id="sidebar_confirmed"></span><br>
+        Deaths: <span id="sidebar_deaths"></span><br>
+        Recoveries: <span id="sidebar_recoveries"></span><br>
+        Active: <span id="sidebar_active"></span><br>
+        <hr>
+      </div>
+
+      <div>
         <h2> Layer Controls </h2>
         <label for="news_data_checkbox">
             <div class="circle_news_small">1</div>
@@ -363,12 +376,8 @@
   </div>
 </main>
 
-<!--<script src="time_series_19-covid-confirmed.js"></script>
-<script src="time_series_19-covid-deaths.js"></script>
-<script src="time_series_19-covid-recovered.js"></script>-->
-
-<script src="jhu_data.js"></script>
-<script src="bounding-boxes.js"></script>
-<script src="js_buzz.js"></script>
+<script src="jhu_data.js?v=2"></script>
+<script src="bounding-boxes.js?v=2"></script>
+<script src="js_buzz.js?v=2"></script>
 </body>
 </html>

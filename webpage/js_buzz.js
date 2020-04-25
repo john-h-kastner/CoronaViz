@@ -1,5 +1,10 @@
 var map = L.map('map', {'worldCopyJump': true}).setView([0,0], 2);
 
+map.on('zoomend', function(e) {
+    selected_marker = undefined;
+    info.clear();
+});
+
 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}' + (L.Browser.retina ? '@2x.png' : '.png'), {
    attribution:'&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
    subdomains: 'abcd',
@@ -38,9 +43,53 @@ info.update = function (confirmed, deaths, recoveries, active, placenames) {
                "Deaths: " + deaths  + "<br>" +
                "Recoveries:" + recoveries + "<br>" +
                "Active:" + active + "<br>";
+    updateSidebarInfo(confirmed, deaths, recoveries, active, placenames);
 };
+
+
+function updateSidebarInfo(confirmed, deaths, recoveries, active, placenames) {
+    document.getElementById("sidebar_confirmed").innerHTML = confirmed;
+    document.getElementById("sidebar_deaths").innerHTML = deaths;
+    document.getElementById("sidebar_recoveries").innerHTML = recoveries;
+    document.getElementById("sidebar_active").innerHTML = active;
+    document.getElementById("sidebar_location").innerHTML = placenames;
+}
+
+function clearSidebarInfo() {
+    updateSidebarInfo("","","","","");
+}
+
 info.clear = function () {
     this._div.innerHTML = "Hover over or click marker";
+    clearSidebarInfo();
+}
+
+info.updateForMarker = function(marker){
+    if (selected_marker && selected_marker._icon) {
+        selected_marker._icon.classList.remove('selected');
+    } else if (selected_marker && selected_marker.layer._icon) {
+        selected_marker.layer._icon.classList.remove('selected');
+    }
+
+    var confirmed, deaths, recoveries, active, names;
+    if(marker.layer){
+        confirmed = marker.layer.getAllChildMarkers().reduce((a,v) => a + v.confirmed, 0);
+        deaths = marker.layer.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0);
+        recoveries = marker.layer.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0);
+        active = marker.layer.getAllChildMarkers().reduce((a,v) => a + v.active, 0);
+        names = marker.layer.getAllChildMarkers().slice().filter((e)=>e.confirmed>0).sort((a,b) => a.confirmed - b.confirmed).reverse().map((v) => v.name);
+        marker.layer._icon.classList.add('selected');
+    } else {
+        confirmed = marker.confirmed;
+        deaths = marker.deaths;
+        recoveries = marker.recoveries;
+        active = marker.active;
+        names = marker.name;
+        marker._icon.classList.add('selected');
+    }
+    info.update(confirmed, deaths, recoveries, active, names);
+
+    selected_marker = marker;
 }
 
 info.addTo(map);
@@ -75,6 +124,8 @@ for (var e of sorted_options) {
 
 var dataStartDate;
 var dataEndDate;
+var displayStartDate;
+var displayEndDate;
 
 var animateWindow = 7 * 24 * 60;
 var animateStep = 24 * 60;
@@ -83,6 +134,8 @@ var cumulativeAnimation = document.getElementById("cumulative_animation").checke
 document.getElementById("animate_window").disabled = cumulativeAnimation;
 
 var animation_paused = false;
+
+var selected_marker = undefined;
 
 class NewsStandDataLayer {
     constructor(plottingLayer, color_fn, url_fn) {
@@ -115,8 +168,8 @@ class NewsStandDataLayer {
         this.plottingLayer = ! this.plottingLayer;
 
         if(this.plottingLayer){
-            var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
-            var endDate = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
+            var startDate = displayStartDate;
+            var endDate = displayEndDate;
             var subMarkerList = this.markersBetween(startDate, endDate);
             this.markers.clearLayers();
             this.markers.addLayers(subMarkerList);
@@ -246,50 +299,21 @@ class JHUDataLayer {
             }
         });
 
-        var selected_marker = undefined;
-        this.markers.on('clustermouseover clustermousedown', function (a) {
-            if (selected_marker && selected_marker._icon) {
-                selected_marker._icon.classList.remove('selected');
-            }
-            var confirmed = a.layer.getAllChildMarkers().reduce((a,v) => a + v.confirmed, 0);
-            var deaths = a.layer.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0);
-            var recoveries = a.layer.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0);
-            var active = a.layer.getAllChildMarkers().reduce((a,v) => a + v.active, 0);
-            var names = a.layer.getAllChildMarkers().slice().sort((a,b) => a.confirmed - b.confirmed).reverse().map((v) => v.name);
-
-            info.update(confirmed, deaths, recoveries, active, names);
-            a.layer._icon.classList.add('selected');
-            selected_marker = a.layer;
-
-        });
-        this.markers.on('clustermouseout', function (a) {
-            info.clear();
-            a.layer._icon.classList.remove('selected');
-            selected_marker = undefined;
+        this.markers.on('clustermousedown', function (a) {
+            info.updateForMarker(a);
         });
         this.timeSeriesMarkers = this.timeSeries.map(function (p) {
             var marker = L.marker([p.lat, p.lng]);
             marker.name = p.name;
             marker.time_series = p.time_series;
-            marker.on('mouseover click', function(e) {
-                if (selected_marker && selected_marker._icon) {
-                    selected_marker._icon.classList.remove('selected');
-                }
-                info.update(marker.confirmed, marker.deaths, marker.recoveries, marker.active, marker.name);
-                marker._icon.classList.add('selected');
-                selected_marker = marker;
-            });
-            marker.on('mouseout', function(e) {
-                info.clear();
-                marker._icon.classList.remove('selected');
-                selected_marker = undefined;
+            marker.on('click', function(e) {
+                info.updateForMarker(marker);
             });
             return marker;
         });
 
         this.markers.clearLayers();
         this.markers.addLayers(this.timeSeriesMarkers)
-
     }
 
     plottingAny() {
@@ -306,8 +330,8 @@ class JHUDataLayer {
         }
         this.subLayers[subLayer].plotting = ! this.subLayers[subLayer].plotting;
         if(this.plottingAny()) {
-            var startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
-            var endDate = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
+            var startDate = displayStartDate;
+            var endDate = displayEndDate;
             this.plotData(startDate, endDate);
         } else {
             map.removeLayer(this.markers);
@@ -469,7 +493,9 @@ function downloadData() {
     newsLayer.updateLayer();
 
     dataStartDate = document.getElementById("start_date").valueAsDate;
+    displayStartDate = dateToEpochMins(dataStartDate);
     dataEndDate = document.getElementById("end_date").valueAsDate;
+    displayEndDate = dateToEpochMins(dataEndDate);
 
     var min = dateToEpochMins(dataStartDate)
     var max = dateToEpochMins(dataEndDate)
@@ -508,9 +534,9 @@ async function animateMarkers() {
     if(animation_paused) {
         if(cumulativeAnimation) {
             start = dateToEpochMins(dataStartDate);
-            i = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
+            i = displayEndDate;
         } else {
-            start = dateToEpochMins(document.getElementById("display_start_date").valueAsDate)
+            start = displayStartDate;
             i = start;
         }
     } else {
@@ -536,7 +562,6 @@ async function animateMarkers() {
 }
 
 function pauseAnimation() {
-    console.log('pause');
     animating = false;
     animation_paused = true;
     document.getElementById("animate").innerHTML = 'Resume Animation &raquo;';
@@ -581,19 +606,21 @@ function setAnimateWindow(size) {
     var startDate;
     var endDate;
     if (size == "max") {
-        console.log('max')
         startDate = dateToEpochMins(document.getElementById("start_date").valueAsDate);
         endDate = dateToEpochMins(document.getElementById("end_date").valueAsDate);
         animateWindow = endDate - startDate;
     } else {
         animateWindow = parseInt(size);
-        startDate = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
+        startDate = displayStartDate;
         endDate = startDate + animateWindow;
     }
     setDisplayedDateRange(startDate, endDate);
 }
 
 function setDisplayedDateRange(startMins, endMins) {
+    displayEndDate = endMins;
+    displayStartDate = startMins;
+
     // Set UI controls to reflect these values
     document.getElementById("display_start_date").valueAsDate = epochMinsToDate(startMins);
     document.getElementById("display_end_date").valueAsDate = epochMinsToDate(endMins);
@@ -603,6 +630,10 @@ function setDisplayedDateRange(startMins, endMins) {
     newsLayer.plotData(startMins, endMins);
     twitterLayer.plotData(startMins, endMins);
     jhuLayer.plotData(startMins, endMins);
+
+    if(selected_marker){
+        info.updateForMarker(selected_marker);
+    }
 }
 
 function setAnimateStep(step) {
@@ -619,9 +650,9 @@ function toggleCumulative() {
 }
 
 function stepForward() {
-    var current_end = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
+    var current_end = displayEndDate; 
     current_end += animateStep;
-    var current_start = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
+    var current_start = displayStartDate;
     if(!cumulativeAnimation){
         current_start += animateStep;
     }
@@ -629,9 +660,9 @@ function stepForward() {
 }
 
 function stepBack() {
-    var current_end = dateToEpochMins(document.getElementById("display_end_date").valueAsDate);
+    var current_end = displayEndDate; 
     current_end -= animateStep;
-    var current_start = dateToEpochMins(document.getElementById("display_start_date").valueAsDate);
+    var current_start = displayStartDate;
     if(!cumulativeAnimation){
         current_start -= animateStep;
     }
