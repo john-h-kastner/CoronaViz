@@ -100,7 +100,6 @@ $( "#slider-range" ).slider({
   max: 100,
   values: [ 0, 100 ],
   slide: function( event, ui ) {
-    terminateAnimation();
     var displayStartMins = ui.values[0];
     var displayEndMins = ui.values[1];
 
