@@ -214,23 +214,26 @@ class NewsStandDataLayer {
         var loader = document.getElementById('loader');
         loader.style.display = 'block';
 
-        var url = this.url_fn();
-        var xhr = new XMLHttpRequest();
         var that = this;
-        xhr.open("GET", url, true);
-        xhr.onload = function (e) {
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-              var nodes = JSON.parse(xhr.responseText);
-              that.setMarkers(nodes);
-            } else {
-              console.error(xhr.statusText);
+        return new Promise(function (resolve, reject) {
+            var url = that.url_fn();
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.onload = function (e) {
+              if (xhr.readyState === 4) {
+                loader.style.display = 'none';
+                if (xhr.status === 200) {
+                  var nodes = JSON.parse(xhr.responseText);
+                  that.setMarkers(nodes);
+                  resolve();
+                } else {
+                  console.error(xhr.statusText);
+                  reject();
+                }
+              }
             }
-
-            loader.style.display = 'none';
-          }
-        }
-        xhr.send(null);
+            xhr.send();
+        });
     }
 
     makePopupHtml(articles, name) {
@@ -277,12 +280,6 @@ class NewsStandDataLayer {
 class JHUDataLayer {
     constructor(plottingConfirmed, plottingDeaths, plottingRecoveries, plottingActive) {
         this.timeSeries = jhuData;
-        this.subLayers = {
-            confirmed: { plotting: plottingConfirmed },
-            deaths: { plotting: plottingDeaths },
-            recoveries: { plotting: plottingRecoveries },
-            active: {plotting:  plottingActive }
-        };
 
         var that = this;
         this.markers = L.markerClusterGroup({
@@ -313,6 +310,17 @@ class JHUDataLayer {
 
         this.markers.clearLayers();
         this.markers.addLayers(this.timeSeriesMarkers)
+
+        this.subLayers = {
+            confirmed: { plotting: plottingConfirmed },
+            deaths: { plotting: plottingDeaths },
+            recoveries: { plotting: plottingRecoveries },
+            active: {plotting:  plottingActive }
+        };
+        if(this.plottingAny()){
+            map.addLayer(this.markers);
+            this.plotData(displayStartDate, displayEndDate);
+        }
     }
 
     plottingAny() {
@@ -488,21 +496,23 @@ document.getElementById("end_date").valueAsDate = new Date();
 downloadData();
 
 function downloadData() {
-    twitterLayer.updateLayer();
-    newsLayer.updateLayer();
+    var twitterUpdate = twitterLayer.updateLayer();
+    var newsUpdate = newsLayer.updateLayer();
 
-    dataStartDate = document.getElementById("start_date").valueAsDate;
-    displayStartDate = dateToEpochMins(dataStartDate);
-    dataEndDate = document.getElementById("end_date").valueAsDate;
-    displayEndDate = dateToEpochMins(dataEndDate);
+    Promise.allSettled([twitterUpdate, newsUpdate]).then(function (results) {
+        dataStartDate = document.getElementById("start_date").valueAsDate;
+        displayStartDate = dateToEpochMins(dataStartDate);
+        dataEndDate = document.getElementById("end_date").valueAsDate;
+        displayEndDate = dateToEpochMins(dataEndDate);
 
-    var min = dateToEpochMins(dataStartDate)
-    var max = dateToEpochMins(dataEndDate)
+        var min = dateToEpochMins(dataStartDate)
+        var max = dateToEpochMins(dataEndDate)
 
-    $("#slider-range").slider("option", "min", min);
-    $("#slider-range").slider("option", "max", max);
+        $("#slider-range").slider("option", "min", min);
+        $("#slider-range").slider("option", "max", max);
 
-    setDisplayedDateRange(min, max);
+        setDisplayedDateRange(min, max);
+    });
 }
 
 //TODO: make this a binary search since that's definitely more efficient. To bad
@@ -574,7 +584,11 @@ function terminateAnimation() {
 }
 
 function markerSize(clusterSize) {
-  return 40 + Math.log(2*clusterSize)**2;
+  if(clusterSize == 0){
+      return 0;
+  } else {
+      return 40 + Math.log(2*clusterSize)**2;
+  }
 }
 
 function dateToEpochMins(date) {
