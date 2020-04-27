@@ -178,8 +178,8 @@ class NewsStandDataLayer {
     }
 
     markersBetween(timeStart, timeEnd) {
-        var iStart = nodeIndexOfTime(this.nodeList, timeStart)
-        var iEnd = nodeIndexOfTime(this.nodeList, timeEnd)
+        var iStart = nodeIndexOfTime(this.nodeList.map((e)=>e.time), timeStart)
+        var iEnd = nodeIndexOfTime(this.nodeList.map((e)=>e.time), timeEnd)
         return this.markerList.slice(iStart, iEnd);
     }
 
@@ -349,12 +349,12 @@ class JHUDataLayer {
         if( this.plottingAny() ){
             for (var i = 0; i < this.timeSeriesMarkers.length; i++){
                 var m = this.timeSeriesMarkers[i];
-                var entryStart = m.time_series[nodeIndexOfTime(m.time_series, timeStart)]
-                var entryEnd = m.time_series[nodeIndexOfTime(m.time_series, timeEnd)];
+                var entryStart = m.time_series[nodeIndexOfTime(m.time_series.map((e)=>e[0]), timeStart)]
+                var entryEnd = m.time_series[nodeIndexOfTime(m.time_series.map((e)=>e[0]), timeEnd)];
 
-                var confirmed = entryEnd.confirmed - entryStart.confirmed;
-                var deaths = entryEnd.deaths - entryStart.deaths;
-                var recoveries = entryEnd.recovered - entryStart.recovered;
+                var confirmed = entryEnd[1] - entryStart[1];
+                var deaths = entryEnd[2] - entryStart[2];
+                var recoveries = entryEnd[3] - entryStart[3];
                 var active = this.computeActive(confirmed, deaths, recoveries);
 
                 var icon = this.layerIcon(confirmed, deaths, recoveries, active);
@@ -520,7 +520,7 @@ function downloadData() {
 // so why do more work than I have to? Make this change if it's too slow.
 function nodeIndexOfTime(list, time) {
     var index = list.findIndex(function (e) {
-        return e.time >= time;
+        return e >= time;
     });
     if (index == -1) {
         return list.length - 1;

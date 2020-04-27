@@ -106,21 +106,11 @@ for i in range(0,len(confirmed)):
     time_series = []
     if recovered_entry:
         for (c,d,r) in zip(confirmed_entry['time_series'], deaths_entry['time_series'], recovered_entry['time_series']):
-            time_series_entry = {
-                'time': c['time'],
-                'confirmed': c['cases'],
-                'deaths': d['cases'],
-                'recovered': r['cases']
-            }
+            time_series_entry = [c['time'], c['cases'], d['cases'], r['cases']]
             time_series.append(time_series_entry)
     else:
         for (c,d) in zip(confirmed_entry['time_series'], deaths_entry['time_series']):
-            time_series_entry = {
-                'time': c['time'],
-                'confirmed': c['cases'],
-                'deaths': d['cases'],
-                'recovered': 0
-            }
+            time_series_entry = [c['time'], c['cases'], d['cases'], 0]
             time_series.append(time_series_entry)
         
     row_list.append({
