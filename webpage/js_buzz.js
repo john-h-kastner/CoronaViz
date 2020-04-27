@@ -2,6 +2,7 @@ var map = L.map('map', {'worldCopyJump': true}).setView([0,0], 2);
 
 map.on('zoomend', function(e) {
     selected_marker = undefined;
+    sidebar_selected_marker = undefined;
     info.clear();
 });
 
@@ -21,6 +22,15 @@ info.onAdd = function (map) {
 };
 
 info.update = function (confirmed, deaths, recoveries, active, placenames) {
+    placenames = placenamesString(placenames);
+    this._div.innerHTML = (placenames != undefined ? "<b>" + placenames + "</b><br>" : "") +
+               "Confirmed: " + confirmed + "</br>" +
+               "Deaths: " + deaths  + "<br>" +
+               "Recoveries:" + recoveries + "<br>" +
+               "Active:" + active + "<br>";
+};
+
+function placenamesString(placenames) {
     if(Array.isArray(placenames)) {
         var truncated = false;
         placenames = placenames.reduce(function (names_str,next) {
@@ -38,16 +48,11 @@ info.update = function (confirmed, deaths, recoveries, active, placenames) {
             placenames = placenames.substring(0, placenames.length-2);
         }
     }
-    this._div.innerHTML = (placenames != undefined ? "<b>" + placenames + "</b><br>" : "") +
-               "Confirmed: " + confirmed + "</br>" +
-               "Deaths: " + deaths  + "<br>" +
-               "Recoveries:" + recoveries + "<br>" +
-               "Active:" + active + "<br>";
-    updateSidebarInfo(confirmed, deaths, recoveries, active, placenames);
-};
-
+    return placenames;
+}
 
 function updateSidebarInfo(confirmed, deaths, recoveries, active, placenames) {
+    placenames = placenamesString(placenames);
     document.getElementById("sidebar_confirmed").innerHTML = confirmed;
     document.getElementById("sidebar_deaths").innerHTML = deaths;
     document.getElementById("sidebar_recoveries").innerHTML = recoveries;
@@ -59,9 +64,37 @@ function clearSidebarInfo() {
     updateSidebarInfo("","","","","");
 }
 
+function updateSidebarForMarker(marker) {
+    if (sidebar_selected_marker && sidebar_selected_marker._icon) {
+        sidebar_selected_marker._icon.classList.remove('selected');
+    } else if (sidebar_selected_marker && sidebar_selected_marker.layer._icon) {
+        sidebar_selected_marker.layer._icon.classList.remove('selected');
+    }
+
+    var confirmed, deaths, recoveries, active, names;
+    if(marker.layer){
+        confirmed = marker.layer.getAllChildMarkers().reduce((a,v) => a + v.confirmed, 0);
+        deaths = marker.layer.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0);
+        recoveries = marker.layer.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0);
+        active = marker.layer.getAllChildMarkers().reduce((a,v) => a + v.active, 0);
+        names = marker.layer.getAllChildMarkers().slice().filter((e)=>e.confirmed>0).sort((a,b) => a.confirmed - b.confirmed).reverse().map((v) => v.name);
+        marker.layer._icon.classList.add('selected');
+    } else {
+        confirmed = marker.confirmed;
+        deaths = marker.deaths;
+        recoveries = marker.recoveries;
+        active = marker.active;
+        names = marker.name;
+        marker._icon.classList.add('selected');
+    }
+    updateSidebarInfo(confirmed, deaths, recoveries, active, names);
+
+    sidebar_selected_marker = marker;
+
+}
+
 info.clear = function () {
     this._div.innerHTML = "Hover over or click marker";
-    clearSidebarInfo();
 }
 
 info.updateForMarker = function(marker){
@@ -91,6 +124,7 @@ info.updateForMarker = function(marker){
 
     selected_marker = marker;
 }
+
 
 info.addTo(map);
 
@@ -135,6 +169,7 @@ document.getElementById("animate_window").disabled = cumulativeAnimation;
 var animation_paused = false;
 
 var selected_marker = undefined;
+var sidebar_selected_marker = undefined;
 
 class NewsStandDataLayer {
     constructor(plottingLayer, color_fn, url_fn) {
@@ -295,15 +330,27 @@ class JHUDataLayer {
             }
         });
 
-        this.markers.on('clustermousedown', function (a) {
+        this.markers.on('clustermouseover', function (a) {
             info.updateForMarker(a);
+        });
+        this.markers.on('clustermouseout', function (a) {
+            info.clear();
+        });
+        this.markers.on('clustermousedown', function (a) {
+            updateSidebarForMarker(a);
         });
         this.timeSeriesMarkers = this.timeSeries.map(function (p) {
             var marker = L.marker([p.lat, p.lng]);
             marker.name = p.name;
             marker.time_series = p.time_series;
             marker.on('click', function(e) {
+                updateSidebarForMarker(marker);
+            });
+            marker.on('mouseover', function(e) {
                 info.updateForMarker(marker);
+            });
+            marker.on('mouseout', function(e) {
+                info.clear();
             });
             return marker;
         });
@@ -646,6 +693,9 @@ function setDisplayedDateRange(startMins, endMins) {
 
     if(selected_marker){
         info.updateForMarker(selected_marker);
+    }
+    if(sidebar_selected_marker) {
+        updateSidebarForMarker(sidebar_selected_marker);
     }
 }
 
