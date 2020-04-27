@@ -547,10 +547,8 @@ function downloadData() {
     var newsUpdate = newsLayer.updateLayer();
 
     Promise.allSettled([twitterUpdate, newsUpdate]).then(function (results) {
-        dataStartDate = document.getElementById("start_date").valueAsDate;
-        displayStartDate = dateToEpochMins(dataStartDate);
         dataEndDate = document.getElementById("end_date").valueAsDate;
-        displayEndDate = dateToEpochMins(dataEndDate);
+        dataStartDate = document.getElementById("start_date").valueAsDate;
 
         var min = dateToEpochMins(dataStartDate)
         var max = dateToEpochMins(dataEndDate)
@@ -558,7 +556,7 @@ function downloadData() {
         $("#slider-range").slider("option", "min", min);
         $("#slider-range").slider("option", "max", max);
 
-        setDisplayedDateRange(min, max);
+        setDisplayedDateRange(max - animateWindow, max);
     });
 }
 

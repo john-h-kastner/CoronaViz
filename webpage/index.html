@@ -259,11 +259,10 @@
         <span class="line">
         <label for="animate_window">Animation Window:</label>
         <select id="animate_window" onchange="setAnimateWindow(this.value)">
-          <option value="60">Hour</option>
           <option value="1140">Day</option>
-          <option value="10080">Week</option>
+          <option value="10080" selected>Week</option>
           <option value="43200">Month</option>
-          <option value="max" selected>Maximum</option>
+          <option value="max">Maximum</option>
           <option disabled>Custom</option>
         </select>
         </span>
@@ -278,7 +277,6 @@
         <span class="line">
         <label for="animate_step">Animation Step:</label>
         <select id="animate_step" onchange="setAnimateStep(this.value)">
-          <option value="60">Hour</option>
           <option value="1140" selected>Day</option>
           <option value="10080">Week</option>
           <option value="43200">Month</option>
