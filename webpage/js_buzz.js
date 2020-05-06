@@ -22,6 +22,11 @@ info.onAdd = function (map) {
 };
 
 info.update = function (confirmed, deaths, recoveries, active, placenames) {
+    confirmed = normalizeCount(confirmed);
+    deaths = normalizeCount(deaths);
+    active = normalizeCount(active);
+    recoveries = normalizeCount(recoveries);
+
     placenames = placenamesString(placenames);
     this._div.innerHTML = (placenames != undefined ? "<b>" + placenames + "</b><br>" : "") +
                "Confirmed: " + confirmed + "</br>" +
@@ -53,10 +58,10 @@ function placenamesString(placenames) {
 
 function updateSidebarInfo(confirmed, deaths, recoveries, active, placenames) {
     placenames = placenamesString(placenames);
-    document.getElementById("sidebar_confirmed").innerHTML = confirmed;
-    document.getElementById("sidebar_deaths").innerHTML = deaths;
-    document.getElementById("sidebar_recoveries").innerHTML = recoveries;
-    document.getElementById("sidebar_active").innerHTML = active;
+    document.getElementById("sidebar_confirmed").innerHTML = normalizeCount(confirmed);
+    document.getElementById("sidebar_deaths").innerHTML = normalizeCount(deaths);
+    document.getElementById("sidebar_recoveries").innerHTML = normalizeCount(recoveries);
+    document.getElementById("sidebar_active").innerHTML = normalizeCount(active);
     document.getElementById("sidebar_location").innerHTML = placenames;
 }
 
@@ -165,6 +170,7 @@ var animateStep = 24 * 60;
 var animateSpeed = 100;
 var cumulativeAnimation = document.getElementById("cumulative_animation").checked;
 document.getElementById("animate_window").disabled = cumulativeAnimation;
+var dailyRate = document.getElementById("daily_rate").checked;
 
 var animation_paused = false;
 
@@ -628,12 +634,22 @@ function terminateAnimation() {
     document.getElementById("animate").innerHTML = 'Start Animation &raquo;';
 }
 
+function normalizeCount(clusterSize) {
+    if (dailyRate) {
+        clusterSize = (clusterSize / animateWindow) * (60*24);
+    } else {
+        clusterSize = clusterSize;
+    }
+    return clusterSize.toFixed(2);
+}
+
 function markerSize(clusterSize) {
-  if(clusterSize == 0){
-      return 0;
-  } else {
-      return 40 + Math.log(2*clusterSize)**2;
-  }
+    clusterSize = normalizeCount(clusterSize);
+    if(clusterSize < 0){
+        return 0;
+    } else {
+        return 40 + Math.log(2*clusterSize)**2;
+    }
 }
 
 function dateToEpochMins(date) {
@@ -708,6 +724,10 @@ function setAnimateSpeed(speed) {
 function toggleCumulative() {
     cumulativeAnimation = ! cumulativeAnimation;
     document.getElementById("animate_window").disabled = cumulativeAnimation;
+}
+
+function toggleDailyRate() {
+    dailyRate = ! dailyRate;
 }
 
 function stepForward() {
