@@ -6,6 +6,27 @@ map.on('zoomend', function(e) {
     info.clear();
 });
 
+map.on('mousemove', function(e) {
+    if (jhuLayer && jhuLayer.markers._gridClusters) {
+        gridClustered = jhuLayer.markers._gridClusters[map.getZoom()];
+        gridUnclustered = jhuLayer.markers._gridUnclustered[map.getZoom()];
+        point  = map.project(e.latlng);
+        marker = gridClustered.getNearObject(point);
+        if(marker) {
+            // wrap this in an object with the 'layer' field because my code
+            // is shit and I don't want to fix it. lmao
+            info.updateForMarker({layer: marker});
+        } else {
+            singletonMarker = gridUnclustered.getNearObject(point);
+            if(singletonMarker){
+                info.updateForMarker(singletonMarker);
+            }
+        }
+    } else {
+        console.log('cluster not initialized');
+    }
+});
+
 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}' + (L.Browser.retina ? '@2x.png' : '.png'), {
    attribution:'&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
    subdomains: 'abcd',
@@ -336,12 +357,12 @@ class JHUDataLayer {
             }
         });
 
-        this.markers.on('clustermouseover', function (a) {
-            info.updateForMarker(a);
-        });
-        this.markers.on('clustermouseout', function (a) {
-            info.clear();
-        });
+        //this.markers.on('clustermouseover', function (a) {
+        //    info.updateForMarker(a);
+        //});
+        //this.markers.on('clustermouseout', function (a) {
+        //    info.clear();
+        //});
         this.markers.on('clustermousedown', function (a) {
             updateSidebarForMarker(a);
         });
@@ -352,12 +373,12 @@ class JHUDataLayer {
             marker.on('click', function(e) {
                 updateSidebarForMarker(marker);
             });
-            marker.on('mouseover', function(e) {
-                info.updateForMarker(marker);
-            });
-            marker.on('mouseout', function(e) {
-                info.clear();
-            });
+            //marker.on('mouseover', function(e) {
+            //    info.updateForMarker(marker);
+            //});
+            //marker.on('mouseout', function(e) {
+            //    info.clear();
+            //});
             return marker;
         });
 
