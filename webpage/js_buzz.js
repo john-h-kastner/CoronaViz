@@ -11,16 +11,26 @@ map.on('mousemove', function(e) {
         gridClustered = jhuLayer.markers._gridClusters[map.getZoom()];
         gridUnclustered = jhuLayer.markers._gridUnclustered[map.getZoom()];
         point  = map.project(e.latlng);
-        marker = gridClustered.getNearObject(point);
-        if(marker) {
-            // wrap this in an object with the 'layer' field because my code
-            // is shit and I don't want to fix it. lmao
-            info.updateForMarker({layer: marker});
-        } else {
-            singletonMarker = gridUnclustered.getNearObject(point);
-            if(singletonMarker){
-                info.updateForMarker(singletonMarker);
+
+        var minDist = { marker: undefined, dist: undefined};
+        gridClustered.eachObject(function (e) {
+            dist = gridClustered._sqDist(gridClustered._objectPoint[L.Util.stamp(e)], point);
+            if (!this.dist || dist < this.dist) {
+                this.marker = e;
+                this.dist = dist;
             }
+        },minDist)
+        gridUnclustered.eachObject(function (e) {
+            dist = gridUnclustered._sqDist(gridUnclustered._objectPoint[L.Util.stamp(e)], point);
+            if (!this.dist || dist < this.dist) {
+                this.marker = e;
+                this.dist = dist;
+            }
+        },minDist)
+        if(minDist.marker){
+            info.updateForMarker(minDist.marker);
+        } else {
+            console.log('no marker found');
         }
     } else {
         console.log('cluster not initialized');
@@ -124,20 +134,18 @@ info.clear = function () {
 }
 
 info.updateForMarker = function(marker){
-    if (selected_marker && selected_marker._icon) {
+    if(selected_marker) {
         selected_marker._icon.classList.remove('selected');
-    } else if (selected_marker && selected_marker.layer._icon) {
-        selected_marker.layer._icon.classList.remove('selected');
     }
 
     var confirmed, deaths, recoveries, active, names;
-    if(marker.layer){
-        confirmed = marker.layer.getAllChildMarkers().reduce((a,v) => a + v.confirmed, 0);
-        deaths = marker.layer.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0);
-        recoveries = marker.layer.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0);
-        active = marker.layer.getAllChildMarkers().reduce((a,v) => a + v.active, 0);
-        names = marker.layer.getAllChildMarkers().slice().filter((e)=>e.confirmed>0).sort((a,b) => a.confirmed - b.confirmed).reverse().map((v) => v.name);
-        marker.layer._icon.classList.add('selected');
+    if(marker.getAllChildMarkers){
+        confirmed = marker.getAllChildMarkers().reduce((a,v) => a + v.confirmed, 0);
+        deaths = marker.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0);
+        recoveries = marker.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0);
+        active = marker.getAllChildMarkers().reduce((a,v) => a + v.active, 0);
+        names = marker.getAllChildMarkers().slice().filter((e)=>e.confirmed>0).sort((a,b) => a.confirmed - b.confirmed).reverse().map((v) => v.name);
+        marker._icon.classList.add('selected');
     } else {
         confirmed = marker.confirmed;
         deaths = marker.deaths;
@@ -357,12 +365,6 @@ class JHUDataLayer {
             }
         });
 
-        //this.markers.on('clustermouseover', function (a) {
-        //    info.updateForMarker(a);
-        //});
-        //this.markers.on('clustermouseout', function (a) {
-        //    info.clear();
-        //});
         this.markers.on('clustermousedown', function (a) {
             updateSidebarForMarker(a);
         });
@@ -373,12 +375,6 @@ class JHUDataLayer {
             marker.on('click', function(e) {
                 updateSidebarForMarker(marker);
             });
-            //marker.on('mouseover', function(e) {
-            //    info.updateForMarker(marker);
-            //});
-            //marker.on('mouseout', function(e) {
-            //    info.clear();
-            //});
             return marker;
         });
 
