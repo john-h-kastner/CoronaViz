@@ -640,11 +640,10 @@ function terminateAnimation() {
 
 function normalizeCount(clusterSize) {
     if (dailyRate) {
-        clusterSize = (clusterSize / animateWindow) * (60*24);
+        return ((clusterSize / animateWindow) * (60*24)).toFixed(1);
     } else {
-        clusterSize = clusterSize;
+        return clusterSize;
     }
-    return clusterSize.toFixed(2);
 }
 
 function markerSize(clusterSize) {
