@@ -197,10 +197,7 @@ var displayEndDate;
 var animateWindow = 7 * 24 * 60;
 var animateStep = 24 * 60;
 var animateSpeed = 100;
-var cumulativeAnimation = document.getElementById("cumulative_animation").checked;
-document.getElementById("animate_window").disabled = cumulativeAnimation;
 var dailyRate = document.getElementById("daily_rate").checked;
-
 var animation_paused = false;
 
 var selected_marker = undefined;
@@ -609,24 +606,14 @@ async function animateMarkers() {
     var start;
     var i;
     if(animation_paused) {
-        if(cumulativeAnimation) {
-            start = dateToEpochMins(dataStartDate);
-            i = displayEndDate;
-        } else {
-            start = displayStartDate;
-            i = start;
-        }
+        start = displayStartDate;
+        i = start;
     } else {
         start = dateToEpochMins(dataStartDate);
         i = start
     }
     for (;animating && i < dateToEpochMins(dataEndDate) - animateWindow; i+=animateStep) {
-
-      if(cumulativeAnimation){
-        setDisplayedDateRange(start, i+animateWindow);
-      } else {
-        setDisplayedDateRange(i, i+animateWindow);
-      }
+      setDisplayedDateRange(i, i+animateWindow);
 
       await new Promise(r => setTimeout(r, animateSpeed));
     }
@@ -738,12 +725,7 @@ function setAnimateSpeed(speed) {
     animateSpeed = parseInt(speed);
 }
 
-function toggleCumulative() {
-    cumulativeAnimation = ! cumulativeAnimation;
-    document.getElementById("animate_window").disabled = cumulativeAnimation;
-}
-
-function toggleDailyRate() {
+function toggleAnimationType() {
     dailyRate = ! dailyRate;
 }
 
@@ -751,9 +733,7 @@ function stepForward() {
     var current_end = displayEndDate; 
     current_end += animateStep;
     var current_start = displayStartDate;
-    if(!cumulativeAnimation){
-        current_start += animateStep;
-    }
+    current_start += animateStep;
     setDisplayedDateRange(current_start, current_end);
 }
 
@@ -761,9 +741,7 @@ function stepBack() {
     var current_end = displayEndDate; 
     current_end -= animateStep;
     var current_start = displayStartDate;
-    if(!cumulativeAnimation){
-        current_start -= animateStep;
-    }
+    current_start -= animateStep;
     setDisplayedDateRange(current_start, current_end);
 }
 
