@@ -726,6 +726,13 @@ function setAnimateSpeed(speed) {
 
 function toggleAnimationType() {
     dailyRate = ! dailyRate;
+    if(selected_marker){
+        info.updateForMarker(selected_marker);
+    }
+    if(sidebar_selected_marker) {
+        updateSidebarForMarker(sidebar_selected_marker);
+    }
+
 }
 
 function stepForward() {
