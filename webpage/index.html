@@ -300,6 +300,10 @@
         <span class="line">
         <span class="btn btn-secondary" onclick="stepBack();">&lt;</span>
         <span class="btn btn-secondary" id="animate" onclick="animateMarkers();">Start Animation</span>
+        <span id="paused" style="display: none;">
+          <span class="btn btn-secondary" id="resume" onclick="animateMarkers();">Resume</span>
+          <span class="btn btn-secondary" id="stop" onclick="terminateAnimation();">Stop</span>
+        </span>
         <span class="btn btn-secondary" onclick="stepForward();">&gt;</span>
         </span>
         <br>

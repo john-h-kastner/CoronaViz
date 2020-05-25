@@ -600,6 +600,8 @@ function nodeIndexOfTime(list, time) {
 var animating = false;
 async function animateMarkers() {
   if (!animating) {
+    document.getElementById("animate").style.display = "";
+    document.getElementById("paused").style.display = "none";
     document.getElementById("animate").innerHTML = 'Pause Animation';
     animating = true;
 
@@ -628,14 +630,22 @@ async function animateMarkers() {
 function pauseAnimation() {
     animating = false;
     animation_paused = true;
-    document.getElementById("animate").innerHTML = 'Resume Animation &raquo;';
+
+    document.getElementById("animate").style.display = "none";
+    document.getElementById("paused").style.display = "";
 }
 
 // Since I'm doing a bit of a hack here, the least I can do is hide it in function.
 function terminateAnimation() {
     animating = false;
     animation_paused = false;
+
+    document.getElementById("animate").style.display = "";
+    document.getElementById("paused").style.display = "none";
     document.getElementById("animate").innerHTML = 'Start Animation &raquo;';
+    if(dataEndDate){
+        setDisplayedDateRange(dateToEpochMins(dataEndDate) - animateWindow, dateToEpochMins(dataEndDate));
+    }
 }
 
 function normalizeCount(clusterSize) {
