@@ -1,4 +1,8 @@
-var map = L.map('map', {'worldCopyJump': true}).setView([0,0], 2);
+var map = L.map('map', {'worldCopyJump': true});
+
+// Set Default view to South America as requested by Hanan
+south_america_bb = [[12.73, -85.04], [-56.07, -33.40]];
+map.fitBounds(south_america_bb);
 
 map.on('zoomend', function(e) {
     selected_marker = undefined;
@@ -194,7 +198,7 @@ var dataEndDate;
 var displayStartDate;
 var displayEndDate;
 
-var animateWindow = 7 * 24 * 60;
+var animateWindow = 24 * 60;
 var animateStep = 24 * 60;
 var animateSpeed = 100;
 var dailyRate = document.getElementById("daily_rate").checked;
@@ -576,7 +580,7 @@ function downloadData() {
         $("#slider-range").slider("option", "min", min);
         $("#slider-range").slider("option", "max", max);
 
-        setDisplayedDateRange(max - animateWindow, max);
+        setDisplayedDateRange(max - animateWindow - (24 * 60), max - (24 * 60));
     });
 }
 
@@ -767,9 +771,11 @@ function setCountryView(country_code) {
 }
 
 function setMarylandView() {
-    map.fitBounds([[ 39.762, -79.514], [ 37.888, -75.015]])
+    maryland_bb = [[ 39.762, -79.514], [ 37.888, -75.015]];
+    map.fitBounds(maryland_bb);
 }
 
 function setVirginiaView() {
-    map.fitBounds([[ 39.462, -83.672], [ 36.571, -75.015]])
+    virginia_bb = [[ 39.462, -83.672], [ 36.571, -75.015]];
+    map.fitBounds(virginia_bb);
 }

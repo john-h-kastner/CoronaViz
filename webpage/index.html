@@ -267,8 +267,8 @@
         <span class="line">
         <label for="animate_window">Animation Window:</label>
         <select id="animate_window" onchange="setAnimateWindow(this.value)">
-          <option value="1140">Day</option>
-          <option value="10080" selected>Week</option>
+          <option value="1140" selected>Day</option>
+          <option value="10080">Week</option>
           <option value="43200">Month</option>
           <option value="max">Maximum</option>
           <option disabled>Custom</option>
@@ -279,7 +279,7 @@
         <span class="line">
 
         <label for="cumulative_animation">Cumulative:</label>
-        <input type="radio" name="animation_type" id="cumulative_animation" selected onclick="toggleAnimationType();">
+        <input type="radio" name="animation_type" id="cumulative_animation" checked onclick="toggleAnimationType();">
         <label for="daily_rate">Daily Rate:</label>
         <input type="radio" name="animation_type" id="daily_rate" onclick="toggleAnimationType();">
         </span>
