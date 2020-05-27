@@ -765,3 +765,11 @@ function setCountryView(country_code) {
     bb = bounding_boxes[country_code][1];
     map.fitBounds([[bb[1], bb[0]], [bb[3], bb[2]]]);
 }
+
+function setMarylandView() {
+    map.fitBounds([[ 39.762, -79.514], [ 37.888, -75.015]])
+}
+
+function setVirginiaView() {
+    map.fitBounds([[ 39.462, -83.672], [ 36.571, -75.015]])
+}
