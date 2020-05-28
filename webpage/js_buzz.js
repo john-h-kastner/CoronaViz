@@ -197,6 +197,9 @@ $( "#slider-range" ).slider({
     setDisplayedDateRange(displayStartMins, displayEndMins);
 
     animateWindow = displayEndMins - displayStartMins;
+
+    document.getElementById('animate_window').value = 'Custom';
+    console.log('test');
   }
 });
 
@@ -389,7 +392,7 @@ class JHUDataLayer {
         });
 
         this.markers.on('clustermousedown', function (a) {
-            updateSidebarForMarker(a);
+            updateSidebarForMarker(a.layer);
         });
         this.timeSeriesMarkers = this.timeSeries.map(function (p) {
             var marker = L.marker([p.lat, p.lng]);
@@ -602,7 +605,8 @@ function downloadData() {
         $("#slider-range").slider("option", "min", min);
         $("#slider-range").slider("option", "max", max);
 
-        setDisplayedDateRange(max - animateWindow - (3 * 24 * 60), max - (3 * 24 * 60));
+        setDisplayedDateRange(min, min + animateWindow);
+        //setDisplayedDateRange(max - animateWindow - (3 * 24 * 60), max - (3 * 24 * 60));
 
         //Hack because Hanan wants it and I don't care anymore
         selectMarkerByName('Brazil');
@@ -665,7 +669,8 @@ function terminateAnimation() {
     document.getElementById("paused").style.display = "none";
     document.getElementById("animate").innerHTML = 'Start Animation &raquo;';
     if(dataEndDate){
-        setDisplayedDateRange(dateToEpochMins(dataEndDate) - animateWindow - (24*60*3), dateToEpochMins(dataEndDate) - (24*60*3));
+        setDisplayedDateRange(dateToEpochMins(dataStartDate), dateToEpochMins(dataStartDate)+animateWindow);
+        //setDisplayedDateRange(dateToEpochMins(dataEndDate) - animateWindow - (24*60*3), dateToEpochMins(dataEndDate) - (24*60*3));
     }
 }
 
