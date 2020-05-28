@@ -4,6 +4,30 @@ var map = L.map('map', {'worldCopyJump': true});
 south_america_bb = [[12.73, -85.04], [-56.07, -33.40]];
 map.fitBounds(south_america_bb);
 
+function selectMarkerByName(name) {
+    if (jhuLayer && jhuLayer.markers._gridClusters) {
+        gridClustered = jhuLayer.markers._gridClusters[map.getZoom()];
+        gridUnclustered = jhuLayer.markers._gridUnclustered[map.getZoom()];
+
+        var marker = { m: undefined};
+        gridClustered.eachObject(function (e) {
+            if (e.getAllChildMarkers().some((m) => m.name == name)) {
+                this.m = e;
+            }
+        },marker);
+        gridUnclustered.eachObject(function (e) {
+            if (e.name == name) {
+                this.m = e;
+            }
+        },marker);
+        info.updateForMarker(marker.m);
+        updateSidebarForMarker(marker.m);
+    } else {
+        console.log('cluster not initialized');
+    }
+}
+
+
 map.on('zoomend', function(e) {
     selected_marker = undefined;
     sidebar_selected_marker = undefined;
@@ -105,32 +129,23 @@ function clearSidebarInfo() {
 }
 
 function updateSidebarForMarker(marker) {
-    if (sidebar_selected_marker && sidebar_selected_marker._icon) {
-        sidebar_selected_marker._icon.classList.remove('selected');
-    } else if (sidebar_selected_marker && sidebar_selected_marker.layer._icon) {
-        sidebar_selected_marker.layer._icon.classList.remove('selected');
-    }
-
     var confirmed, deaths, recoveries, active, names;
-    if(marker.layer){
-        confirmed = marker.layer.getAllChildMarkers().reduce((a,v) => a + v.confirmed, 0);
-        deaths = marker.layer.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0);
-        recoveries = marker.layer.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0);
-        active = marker.layer.getAllChildMarkers().reduce((a,v) => a + v.active, 0);
-        names = marker.layer.getAllChildMarkers().slice().filter((e)=>e.confirmed>0).sort((a,b) => a.confirmed - b.confirmed).reverse().map((v) => v.name);
-        marker.layer._icon.classList.add('selected');
+    if(marker.getAllChildMarkers){
+        confirmed = marker.getAllChildMarkers().reduce((a,v) => a + v.confirmed, 0);
+        deaths = marker.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0);
+        recoveries = marker.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0);
+        active = marker.getAllChildMarkers().reduce((a,v) => a + v.active, 0);
+        names = marker.getAllChildMarkers().slice().filter((e)=>e.confirmed>0).sort((a,b) => a.confirmed - b.confirmed).reverse().map((v) => v.name);
     } else {
         confirmed = marker.confirmed;
         deaths = marker.deaths;
         recoveries = marker.recoveries;
         active = marker.active;
         names = marker.name;
-        marker._icon.classList.add('selected');
     }
     updateSidebarInfo(confirmed, deaths, recoveries, active, names);
 
     sidebar_selected_marker = marker;
-
 }
 
 info.clear = function () {
@@ -138,7 +153,7 @@ info.clear = function () {
 }
 
 info.updateForMarker = function(marker){
-    if(selected_marker) {
+    if(selected_marker && selected_marker._icon) {
         selected_marker._icon.classList.remove('selected');
     }
 
@@ -149,14 +164,18 @@ info.updateForMarker = function(marker){
         recoveries = marker.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0);
         active = marker.getAllChildMarkers().reduce((a,v) => a + v.active, 0);
         names = marker.getAllChildMarkers().slice().filter((e)=>e.confirmed>0).sort((a,b) => a.confirmed - b.confirmed).reverse().map((v) => v.name);
-        marker._icon.classList.add('selected');
+        if(marker._icon){
+            marker._icon.classList.add('selected');
+        }
     } else {
         confirmed = marker.confirmed;
         deaths = marker.deaths;
         recoveries = marker.recoveries;
         active = marker.active;
         names = marker.name;
-        marker._icon.classList.add('selected');
+        if(marker._icon) {
+            marker._icon.classList.add('selected');
+        }
     }
     info.update(confirmed, deaths, recoveries, active, names);
 
@@ -580,7 +599,10 @@ function downloadData() {
         $("#slider-range").slider("option", "min", min);
         $("#slider-range").slider("option", "max", max);
 
-        setDisplayedDateRange(max - animateWindow - (24 * 60), max - (24 * 60));
+        setDisplayedDateRange(max - animateWindow - (3 * 24 * 60), max - (3 * 24 * 60));
+
+        //Hack because Hanan wants it and I don't care anymore
+        selectMarkerByName('Brazil');
     });
 }
 
