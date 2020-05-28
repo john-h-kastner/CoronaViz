@@ -209,6 +209,9 @@ for (var e of sorted_options) {
     var textnode = document.createTextNode(label);
     option.appendChild(textnode);
     option.value = key;
+    if(label == 'Brazil') {
+        option.selected = 'selected';
+    }
     country_select.appendChild(option);
 }
 
@@ -631,18 +634,10 @@ async function animateMarkers() {
     document.getElementById("animate").innerHTML = 'Pause Animation';
     animating = true;
 
-    var start;
-    var i;
-    if(animation_paused) {
-        start = displayStartDate;
-        i = start;
-    } else {
-        start = dateToEpochMins(dataStartDate);
-        i = start
+    if(!animation_paused) {
+        setDisplayedDateRange(dateToEpochMins(dataStartDate), dateToEpochMins(dataStartDate) + animateWindow);
     }
-    for (;animating && i < dateToEpochMins(dataEndDate) - animateWindow; i+=animateStep) {
-      setDisplayedDateRange(i, i+animateWindow);
-
+    while(animating && stepForward()) {
       await new Promise(r => setTimeout(r, animateSpeed));
     }
     if(animating){
@@ -670,7 +665,7 @@ function terminateAnimation() {
     document.getElementById("paused").style.display = "none";
     document.getElementById("animate").innerHTML = 'Start Animation &raquo;';
     if(dataEndDate){
-        setDisplayedDateRange(dateToEpochMins(dataEndDate) - animateWindow, dateToEpochMins(dataEndDate));
+        setDisplayedDateRange(dateToEpochMins(dataEndDate) - animateWindow - (24*60*3), dateToEpochMins(dataEndDate) - (24*60*3));
     }
 }
 
@@ -776,7 +771,12 @@ function stepForward() {
     current_end += animateStep;
     var current_start = displayStartDate;
     current_start += animateStep;
-    setDisplayedDateRange(current_start, current_end);
+    if(current_end < (dateToEpochMins(dataEndDate) - (24*60))) {
+        setDisplayedDateRange(current_start, current_end);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function stepBack() {
