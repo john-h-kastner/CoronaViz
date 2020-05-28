@@ -1,7 +1,7 @@
 var map = L.map('map', {'worldCopyJump': true});
 
 // Set Default view to South America as requested by Hanan
-south_america_bb = [[12.73, -85.04], [-56.07, -33.40]];
+south_america_bb = [[10.73, -85.04], [-46.07, -33.40]];
 map.fitBounds(south_america_bb);
 
 function selectMarkerByName(name) {
