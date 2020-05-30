@@ -1,7 +1,7 @@
 var map = L.map('map', {'worldCopyJump': true});
 
 // Set Default view to South America as requested by Hanan
-south_america_bb = [[10.73, -85.04], [-46.07, -33.40]];
+south_america_bb = [[5.44, -73.83], [-34.67, -34.98]];
 map.fitBounds(south_america_bb);
 
 function selectMarkerByName(name) {
@@ -135,7 +135,7 @@ function updateSidebarForMarker(marker) {
         deaths = marker.getAllChildMarkers().reduce((a,v) => a + v.deaths, 0);
         recoveries = marker.getAllChildMarkers().reduce((a,v) => a + v.recoveries, 0);
         active = marker.getAllChildMarkers().reduce((a,v) => a + v.active, 0);
-        names = marker.getAllChildMarkers().slice().filter((e)=>e.confirmed>0).sort((a,b) => a.confirmed - b.confirmed).reverse().map((v) => v.name);
+        names = marker.getAllChildMarkers().slice().filter((e)=>e.name=='Brazil'||e.confirmed>0).sort((a,b) => a.confirmed - b.confirmed).reverse().map((v) => v.name);
     } else {
         confirmed = marker.confirmed;
         deaths = marker.deaths;
@@ -199,7 +199,6 @@ $( "#slider-range" ).slider({
     animateWindow = displayEndMins - displayStartMins;
 
     document.getElementById('animate_window').value = 'Custom';
-    console.log('test');
   }
 });
 
@@ -445,8 +444,16 @@ class JHUDataLayer {
         if( this.plottingAny() ){
             for (var i = 0; i < this.timeSeriesMarkers.length; i++){
                 var m = this.timeSeriesMarkers[i];
-                var entryStart = m.time_series[nodeIndexOfTime(m.time_series.map((e)=>e[0]), timeStart)]
-                var entryEnd = m.time_series[nodeIndexOfTime(m.time_series.map((e)=>e[0]), timeEnd)];
+
+                var iStart = nodeIndexOfTime(m.time_series.map((e)=>e[0]), timeStart);
+                var iEnd = nodeIndexOfTime(m.time_series.map((e)=>e[0]), timeEnd);
+
+                if(iStart == iEnd && iStart > 0) {
+                    iStart = iStart - 1;
+                }
+
+                var entryStart = m.time_series[iStart];
+                var entryEnd = m.time_series[iEnd];
 
                 var confirmed = entryEnd[1] - entryStart[1];
                 var deaths = entryEnd[2] - entryStart[2];
@@ -463,6 +470,17 @@ class JHUDataLayer {
             }
             this.markers.refreshClusters();
         }
+    }
+
+    isTimeWindowEmpty() {
+        for (var i = 0; i < this.timeSeriesMarkers.length; i++){
+            if (this.timeSeriesMarkers[i].confirmed > 0 || 
+                this.timeSeriesMarkers[i].deaths > 0 || 
+                this.timeSeriesMarkers[i].recoveries > 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     computeActive(confirmed, deaths, recoveries) {
@@ -592,12 +610,16 @@ document.getElementById("end_date").valueAsDate = new Date();
 downloadData();
 
 function downloadData() {
+
     var twitterUpdate = twitterLayer.updateLayer();
     var newsUpdate = newsLayer.updateLayer();
 
     Promise.allSettled([twitterUpdate, newsUpdate]).then(function (results) {
         dataEndDate = document.getElementById("end_date").valueAsDate;
         dataStartDate = document.getElementById("start_date").valueAsDate;
+
+        document.getElementById('animation_start').valueAsDate = dataStartDate;
+        document.getElementById('animation_end').valueAsDate = dataEndDate;
 
         var min = dateToEpochMins(dataStartDate)
         var max = dateToEpochMins(dataEndDate)
@@ -661,7 +683,7 @@ function pauseAnimation() {
 }
 
 // Since I'm doing a bit of a hack here, the least I can do is hide it in function.
-function terminateAnimation() {
+async function terminateAnimation() {
     animating = false;
     animation_paused = false;
 
@@ -669,8 +691,13 @@ function terminateAnimation() {
     document.getElementById("paused").style.display = "none";
     document.getElementById("animate").innerHTML = 'Start Animation &raquo;';
     if(dataEndDate){
-        setDisplayedDateRange(dateToEpochMins(dataStartDate), dateToEpochMins(dataStartDate)+animateWindow);
-        //setDisplayedDateRange(dateToEpochMins(dataEndDate) - animateWindow - (24*60*3), dateToEpochMins(dataEndDate) - (24*60*3));
+        //setDisplayedDateRange(dateToEpochMins(dataStartDate), dateToEpochMins(dataStartDate)+animateWindow);
+        setDisplayedDateRange(dateToEpochMins(dataEndDate) - animateWindow, dateToEpochMins(dataEndDate));
+        while (jhuLayer.isTimeWindowEmpty()) {
+            console.log('step back', displayEndDate, displayStartDate);
+            stepBack();
+            await new Promise(r => setTimeout(r, animateSpeed));
+        }
     }
 }
 
@@ -776,7 +803,7 @@ function stepForward() {
     current_end += animateStep;
     var current_start = displayStartDate;
     current_start += animateStep;
-    if(current_end < (dateToEpochMins(dataEndDate) - (24*60))) {
+    if(current_end <= dateToEpochMins(dataEndDate)) {
         setDisplayedDateRange(current_start, current_end);
         return true;
     } else {
@@ -805,4 +832,19 @@ function setMarylandView() {
 function setVirginiaView() {
     virginia_bb = [[ 39.462, -83.672], [ 36.571, -75.015]];
     map.fitBounds(virginia_bb);
+}
+
+// I'm not using a new variable here because I'm a lazy sod 
+
+function setAnimationRange(start, end) {
+    dataStartDate = start;
+    dataEndDate = end;
+
+    var min = dateToEpochMins(dataStartDate)
+    var max = dateToEpochMins(dataEndDate)
+
+    $("#slider-range").slider("option", "min", min);
+    $("#slider-range").slider("option", "max", max);
+
+    setDisplayedDateRange(min, min + animateWindow);
 }

@@ -212,7 +212,6 @@
        <div id="loader"></div>
        <div id="progress"><div id="progress-bar"></div></div>
        <div id="map"></div>
-       <div id="slider-range"></div>
        <p>
          <span class="line">
          <input type="date" id="display_start_date" readonly style="border:0">
@@ -220,6 +219,7 @@
          <input type="date" id="display_end_date" readonly style="border:0">
          </span>
        </p>
+       <div id="slider-range"></div>
      </div>
 
      <div id="control_panel" class="col-md-4">
@@ -236,7 +236,6 @@
         <label for="start_date">Data Start Date:</label>
         <input type="date" id="start_date" value="2020-01-01">
         </span>
-        <br>
 
         <span class="line">
         <label for="end_date">Data End Date:</label>
@@ -264,6 +263,18 @@
 
       <div>
         <h2>Animation Controls</h2>
+
+        <span class="line">
+        <label for="animation_start">Animation Start:</label>
+        <input type="date" id="animation_start" onchange='setAnimationRange(this.valueAsDate, dataEndDate);'>
+        </span>
+
+        <span class="line">
+        <label for="animation_end" onchange='setAnimationRange(dataStartDate, this.valueAsDate);'>Animation End:</label>
+        <input type="date" id="animation_end">
+        </span>
+        <br>
+
         <span class="line">
         <label for="animate_window">Animation Window:</label>
         <select id="animate_window" onchange="setAnimateWindow(this.value)">
