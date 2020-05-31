@@ -35,6 +35,11 @@ map.on('zoomend', function(e) {
 });
 
 map.on('mousemove', function(e) {
+    //console.log(e);
+    if(info._div) {
+        info._div.style.left = Math.round(e.containerPoint.x) + "px";
+        info._div.style.top = Math.round(e.containerPoint.y) + "px";
+    }
     if (jhuLayer && jhuLayer.markers._gridClusters) {
         gridClustered = jhuLayer.markers._gridClusters[map.getZoom()];
         gridUnclustered = jhuLayer.markers._gridUnclustered[map.getZoom()];
@@ -72,13 +77,8 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}' 
    minZoom: 0
 }).addTo(map);
 
-var info = L.control();
-
-info.onAdd = function (map) {
-    this._div = L.DomUtil.create('div', 'info');
-    this.clear();
-    return this._div;
-};
+var info = {};
+info._div = document.getElementById("info");
 
 info.update = function (confirmed, deaths, recoveries, active, placenames) {
     confirmed = normalizeCount(confirmed);
@@ -183,7 +183,7 @@ info.updateForMarker = function(marker){
 }
 
 
-info.addTo(map);
+info.clear();
 
 $( "#slider-range" ).slider({
   range: true,
