@@ -35,15 +35,24 @@ map.on('zoomend', function(e) {
 });
 
 map.on('mousemove', function(e) {
-    //console.log(e);
     if(info._div) {
         info._div.style.left = Math.round(e.containerPoint.x) + "px";
         info._div.style.top = Math.round(e.containerPoint.y) + "px";
     }
+
+    info.updateForMarker(getClosestMarker(e.latlng));
+});
+
+map.on('mousedown', function(e) {
+    updateSidebarForMarker(getClosestMarker(e.latlng));
+});
+
+
+function getClosestMarker(latlng) {
     if (jhuLayer && jhuLayer.markers._gridClusters) {
         gridClustered = jhuLayer.markers._gridClusters[map.getZoom()];
         gridUnclustered = jhuLayer.markers._gridUnclustered[map.getZoom()];
-        point  = map.project(e.latlng);
+        point  = map.project(latlng);
 
         var minDist = { marker: undefined, dist: undefined};
         gridClustered.eachObject(function (e) {
@@ -61,14 +70,15 @@ map.on('mousemove', function(e) {
             }
         },minDist)
         if(minDist.marker){
-            info.updateForMarker(minDist.marker);
+            return minDist.marker;
         } else {
             console.log('no marker found');
         }
     } else {
         console.log('cluster not initialized');
     }
-});
+
+}
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}' + (L.Browser.retina ? '@2x.png' : '.png'), {
    attribution:'&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -390,16 +400,10 @@ class JHUDataLayer {
             }
         });
 
-        this.markers.on('clustermousedown', function (a) {
-            updateSidebarForMarker(a.layer);
-        });
         this.timeSeriesMarkers = this.timeSeries.map(function (p) {
             var marker = L.marker([p.lat, p.lng]);
             marker.name = p.name;
             marker.time_series = p.time_series;
-            marker.on('click', function(e) {
-                updateSidebarForMarker(marker);
-            });
             return marker;
         });
 
