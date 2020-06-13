@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>NewsStand CoronaViz</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta http-equiv='cache-control' content='no-cache'>
-    <meta http-equiv='expires' content='0'>
-    <meta http-equiv='pragma' content='no-cache'>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <meta content='no-cache' http-equiv='cache-control'>
+    <meta content='0' http-equiv='expires'>
+    <meta content='no-cache' http-equiv='pragma'>
 
     <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
@@ -47,7 +47,7 @@
 
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <a class="navbar-brand" href="#">
-        <img style="margin-left: -1em; margin-right: -0.4em;" height='60px' src="umd_logo.png"></img>
+        <img style="margin-left: -1em; margin-right: -0.4em;" height='60px' src="umd_logo.png"/>
         <span id="coronaviz_brand">NewsStand CoronaViz</span>
     </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCoronaViz" aria-controls="navbarCoronaViz" aria-expanded="false" aria-label="Toggle navigation">
@@ -390,7 +390,7 @@
         <input type="checkbox" id="recovered_checkbox" onclick="jhuLayer.togglePlotting('recoveries');">
         <br>
 
-        <label for="active_cases_checkbox">
+        <label for="active_checkbox">
             <div class="circle_active_small">1</div>
             <div class="circle_active_med">10</div>
             <div class="circle_active_large">100</div>
@@ -405,7 +405,7 @@
   </div>
 </main>
 
-<script src="jhu_data.js?v=4"></script>
+<script src="jhu_data.js?v=5"></script>
 <script src="bounding-boxes.js?v=4"></script>
 <script src="js_buzz.js?v=4"></script>
 </body>
