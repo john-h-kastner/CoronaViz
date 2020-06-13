@@ -1,10 +1,10 @@
+let animating = false;
+
 const map = L.map('map', {'worldCopyJump': true});
 
 // Set Default view to South America as requested by Hanan
 const south_america_bb = [[5.44, -73.83], [-34.67, -34.98]];
 map.fitBounds(south_america_bb);
-
-const jhuLayer = new JHUDataLayer(confirmedCasesSelected, deathsSelected, recoveredSelected, activeSelected);
 
 function selectMarkerByName(name) {
   if (jhuLayer && jhuLayer.markers._gridClusters) {
@@ -552,6 +552,7 @@ const confirmedCasesSelected = document.getElementById("confirmed_cases_checkbox
 const deathsSelected = document.getElementById("deaths_checkbox").checked;
 const recoveredSelected = document.getElementById("recovered_checkbox").checked;
 const activeSelected = document.getElementById("active_checkbox").checked;
+const jhuLayer = new JHUDataLayer(confirmedCasesSelected, deathsSelected, recoveredSelected, activeSelected);
 
 const newsDataSelected = document.getElementById("news_data_checkbox").checked;
 const newsLayer = new NewsStandDataLayer(newsDataSelected,
@@ -643,7 +644,6 @@ function nodeIndexOfTime(list, time) {
 // 99% sure this isn't the correct way to do this, but I can't be bothered to
 // learn proper threading in JS. Not sure it even exists. This looks like it
 // works though.
-let animating = false;
 
 async function animateMarkers() {
   if (!animating) {
