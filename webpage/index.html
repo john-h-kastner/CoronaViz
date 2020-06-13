@@ -1,64 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>NewsStand CoronaViz</title>
-    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-    <meta content='no-cache' http-equiv='cache-control'>
-    <meta content='0' http-equiv='expires'>
-    <meta content='no-cache' http-equiv='pragma'>
+  <title>NewsStand CoronaViz</title>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <meta content='no-cache' http-equiv='cache-control'>
+  <meta content='0' http-equiv='expires'>
+  <meta content='no-cache' http-equiv='pragma'>
 
-    <!-- Leaflet -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
-      integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-      crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
-      integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
-      crossorigin=""></script>
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+          integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+          crossorigin=""></script>
 
-    <!-- Leaflet.MarkerCluster -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
-      integrity="sha384-5kMSQJ6S4Qj5i09mtMNrWpSi8iXw230pKU76xTmrpezGnNJQzj0NzXjQLLg+jE7k"
-      crossorigin=""/>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
-      integrity="sha384-lPzjPsFQL6te2x+VxmV6q1DpRxpRk0tmnl2cpwAO5y04ESyc752tnEWPKDfl1olr"
-      crossorigin=""/>
-    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"
-      integrity="sha384-RLIyj5q1b5XJTn0tqUhucRZe40nFTocRP91R/NkRJHwAe4XxnTV77FXy/vGLiec2"
-      crossorigin=""></script>
+  <!-- Leaflet.MarkerCluster -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
+        integrity="sha384-5kMSQJ6S4Qj5i09mtMNrWpSi8iXw230pKU76xTmrpezGnNJQzj0NzXjQLLg+jE7k"
+        crossorigin=""/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
+        integrity="sha384-lPzjPsFQL6te2x+VxmV6q1DpRxpRk0tmnl2cpwAO5y04ESyc752tnEWPKDfl1olr"
+        crossorigin=""/>
+  <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"
+          integrity="sha384-RLIyj5q1b5XJTn0tqUhucRZe40nFTocRP91R/NkRJHwAe4XxnTV77FXy/vGLiec2"
+          crossorigin=""></script>
 
-    <!-- JQuery -->
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <!-- JQuery -->
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-      crossorigin="anonymous">
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-      crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+        crossorigin="anonymous">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+          integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+          crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+          integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+          crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="js_buzz.css"/>
+  <link rel="stylesheet" href="js_buzz.css"/>
 </head>
 
 <body>
 
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-    <a class="navbar-brand" href="#">
-        <img style="margin-left: -1em; margin-right: -0.4em;" height='60px' src="umd_logo.png"/>
-        <span id="coronaviz_brand">NewsStand CoronaViz</span>
-    </a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCoronaViz" aria-controls="navbarCoronaViz" aria-expanded="false" aria-label="Toggle navigation">
+  <a class="navbar-brand" href="#">
+    <img style="margin-left: -1em; margin-right: -0.4em;" height='60px' src="umd_logo.png"/>
+    <span id="coronaviz_brand">NewsStand CoronaViz</span>
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCoronaViz"
+          aria-controls="navbarCoronaViz" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
 
   <div class="collapse navbar-collapse" id="navbarCoronaViz">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
-        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#infoModal" style="border-radius: 50%;">
-            ?
+        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#infoModal"
+                style="border-radius: 50%;">
+          ?
         </button>
       </li>
       <li class="nav-item">
@@ -81,119 +85,120 @@
     <!-- Modal content-->
     <div class="hjs_text modal-content">
       <div class="modal-header">
-          <h4 class="modal-title">About NewsStand CoronaViz<sup>*</sup></h4>
+        <h4 class="modal-title">About NewsStand CoronaViz<sup>*</sup></h4>
       </div>
       <div class="modal-body">
 
         <p>
-        NewsStand CoronaViz is a research prototype that enables the dynamic
-        map visualization of COVID-19
-        related variables including the number of infections, active cases,
-        recoveries, and deaths all on a daily basis from the Johns Hopkins University web site
-        at <a href="https://coronavirus.jhu.edu/map.html">https://coronavirus.jhu.edu/map.html</a>, as well as mentions in news articles and
-        tweets as they occur, by allowing the underlying spatial region and the
-        spanned time interval to vary.  Any combination of the variables can be
-        viewed subject to a possibility of clutter which is avoided by the use
-        of concentric circles (termed geo-circles whose radii correspond to
-        ranges of variable values.  The variable values are provided both on
-        cumulative and day-by-day bases.  The visualization enables spatial,
-        temporal, and keyword variation (i.e., it can be used for names of
-        other disease names or entirely other concepts such as names of brands,
-        people, etc. with an appropriate set of variables and document
-        collections).
+          NewsStand CoronaViz is a research prototype that enables the dynamic
+          map visualization of COVID-19
+          related variables including the number of infections, active cases,
+          recoveries, and deaths all on a daily basis from the Johns Hopkins University web site
+          at <a href="https://coronavirus.jhu.edu/map.html">https://coronavirus.jhu.edu/map.html</a>, as well as
+          mentions in news articles and
+          tweets as they occur, by allowing the underlying spatial region and the
+          spanned time interval to vary. Any combination of the variables can be
+          viewed subject to a possibility of clutter which is avoided by the use
+          of concentric circles (termed geo-circles whose radii correspond to
+          ranges of variable values. The variable values are provided both on
+          cumulative and day-by-day bases. The visualization enables spatial,
+          temporal, and keyword variation (i.e., it can be used for names of
+          other disease names or entirely other concepts such as names of brands,
+          people, etc. with an appropriate set of variables and document
+          collections).
         </p>
 
         <p>
 
-        NewsStand CoronaViz is being developed at the University of Maryland
-        at College Park under the leadership of Prof. Hanan Samet
-        <a href=https://www.cs.umd.edu/~hjs>https://www.cs.umd.edu/~hjs</a>
-        with Mr. John Kastner and Mr. Hong Wei. It was motivated by the continuing
-        spread of COVID-19 which led to the desire to track its progress over
-        time to be better prepared to anticipate its emergence in new
-        regions. There exist numerous systems to monitor and map officially
-        released numbers of cases [1] which are the current established means
-        of keeping track of the progress of the virus. However, these systems
-        do not necessarily paint a complete picture. For example, they are
-        primarily mashups in that they do not support zooming in on the map in
-        the sense that they just increase the resolution of the map but do not
-        show the data for the additional units (e.g., states/provinces,
-        counties, etc.) that have become visible as a result of the zoom.
+          NewsStand CoronaViz is being developed at the University of Maryland
+          at College Park under the leadership of Prof. Hanan Samet
+          <a href=https://www.cs.umd.edu/~hjs>https://www.cs.umd.edu/~hjs</a>
+          with Mr. John Kastner and Mr. Hong Wei. It was motivated by the continuing
+          spread of COVID-19 which led to the desire to track its progress over
+          time to be better prepared to anticipate its emergence in new
+          regions. There exist numerous systems to monitor and map officially
+          released numbers of cases [1] which are the current established means
+          of keeping track of the progress of the virus. However, these systems
+          do not necessarily paint a complete picture. For example, they are
+          primarily mashups in that they do not support zooming in on the map in
+          the sense that they just increase the resolution of the map but do not
+          show the data for the additional units (e.g., states/provinces,
+          counties, etc.) that have become visible as a result of the zoom.
         </p>
 
         <p>
-        NewsStand CoronaViz is designed to fill in gaps in the official
-        reports thereby providing a more complete picture. It incorporates the
-        NewsStand system [2,4]
-        <a href="http://newsstand.umiacs.umd.edu">http://newsstand.umiacs.umd.edu</a>
-        (see also the related TwitterStand system [3]
-        <a href=http://twitterstand.umiacs.umd.edu>http://twitterstand.umiacs.umd.edu</a>)
-        which are example applications of a general framework being developed
-        at the University of Maryland at College Park under the direction of
-        Prof. Hanan Samet with his associates to enable searching for
-        information using a map query interface. When the information domain
-        is news, the underlying search domain results from monitoring the
-        output of over 10,000 RSS news sources and is available for retrieval
-        within minutes of publication. The advantage of doing so is that a
-        map, coupled with the ability to vary the zoom level at which it is
-        viewed, provides an inherent granularity to the search process that
-        facilitates an approximate search.
+          NewsStand CoronaViz is designed to fill in gaps in the official
+          reports thereby providing a more complete picture. It incorporates the
+          NewsStand system [2,4]
+          <a href="http://newsstand.umiacs.umd.edu">http://newsstand.umiacs.umd.edu</a>
+          (see also the related TwitterStand system [3]
+          <a href=http://twitterstand.umiacs.umd.edu>http://twitterstand.umiacs.umd.edu</a>)
+          which are example applications of a general framework being developed
+          at the University of Maryland at College Park under the direction of
+          Prof. Hanan Samet with his associates to enable searching for
+          information using a map query interface. When the information domain
+          is news, the underlying search domain results from monitoring the
+          output of over 10,000 RSS news sources and is available for retrieval
+          within minutes of publication. The advantage of doing so is that a
+          map, coupled with the ability to vary the zoom level at which it is
+          viewed, provides an inherent granularity to the search process that
+          facilitates an approximate search.
         </p>
 
         <p>
-        NewsStand CoronaViz makes use of NewsStand to find all news articles
-        and tweets (identified by containing a pointer to a URL of an RSS
-        feed) that contain the keyword (COVID-19 or Coronavirus in our
-        case). It also identifies each toponym (geographic location) that is
-        mentioned in the article or tweet. Next, it takes the cross product of
-        these sets as the set of geocoded keywords. In other words, a pair
-        associating every keyword in the article or tweet with every location
-        mentioned in the article or tweet. Each of the keyword location pairs
-        is also associated with the time of publication of the article in
-        order to enable the temporal component of NewsStand CoronaViz. The
-        result is the ability to explore the spread of the disease through
-        analysis of keyword prevalence in geotagged news article and tweets
-        over spatial and temporal ranges.
+          NewsStand CoronaViz makes use of NewsStand to find all news articles
+          and tweets (identified by containing a pointer to a URL of an RSS
+          feed) that contain the keyword (COVID-19 or Coronavirus in our
+          case). It also identifies each toponym (geographic location) that is
+          mentioned in the article or tweet. Next, it takes the cross product of
+          these sets as the set of geocoded keywords. In other words, a pair
+          associating every keyword in the article or tweet with every location
+          mentioned in the article or tweet. Each of the keyword location pairs
+          is also associated with the time of publication of the article in
+          order to enable the temporal component of NewsStand CoronaViz. The
+          result is the ability to explore the spread of the disease through
+          analysis of keyword prevalence in geotagged news article and tweets
+          over spatial and temporal ranges.
         </p>
 
         <h5>References:</h5>
 
         <ol>
-            <li>
-            E. Dong, H. Du, and L. Gardner.  An interactive web-based
-            dashboard to track COVID-19 in real time.  The Lancet Infectious
+          <li>
+            E. Dong, H. Du, and L. Gardner. An interactive web-based
+            dashboard to track COVID-19 in real time. The Lancet Infectious
             Diseases, 2020.
-            </li>
+          </li>
 
-            <li>
+          <li>
             H. Samet, J. Sankaranarayanan, M. D. Lieberman, M. D. Adelfio,
             B. C. Fruin, J. M. Lotkowski, D. Panozzo, J. Sperling,
-            B. E. Teitler.  Reading news with maps by exploiting spatial
+            B. E. Teitler. Reading news with maps by exploiting spatial
             synonyms. Communications of the ACM, 57(10):64-77, October
-            2014.  Cover article of the October CACM issue. Video specially
+            2014. Cover article of the October CACM issue. Video specially
             made by ACM at <a href="http://vimeo.com/106352925">http://vimeo.com/106352925</a>
-            </li>
+          </li>
 
-            <li>
+          <li>
             J. Sankaranarayanan, H. Samet, B. Teitler, M. D. Lieberman,
-            J. Sperling.  TwitterStand: News in tweets.  Proceedings of the
+            J. Sperling. TwitterStand: News in tweets. Proceedings of the
             17th ACM SIGSPATIAL International Conference on Advances in
             Geographic Information Systems, pages 42-51, Seattle, WA, November
             2009.
-            </li>
+          </li>
 
-            <li>
+          <li>
             B. Teitler, M. D. Lieberman, D. Panozzo, J. Sankaranarayanan,
-            H. Samet, J. Sperling.  NewsStand: A new view on news.
+            H. Samet, J. Sperling. NewsStand: A new view on news.
             Proceedings of the 16th ACM SIGSPATIAL International Conference on
             Advances in Geographic Information Systems, pages 144-153, Irvine,
-            CA, November 2008.  (2008 ACM SIGSPATIAL (ACMGIS08) Best Paper
+            CA, November 2008. (2008 ACM SIGSPATIAL (ACMGIS08) Best Paper
             Award and 2018 SIGSPATIAL 10 Year Impact Award).
-            </li>
-         </ol>
+          </li>
+        </ol>
 
-         <hr>
-         <sub>* This work was sponsored in part by the National Science Foundation under Grant IIS-1816889.</sub>
+        <hr>
+        <sub>* This work was sponsored in part by the National Science Foundation under Grant IIS-1816889.</sub>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -207,77 +212,79 @@
 
   <div class="container-fluid">
 
-   <div class="row map_container">
-     <div class="col-md-8">
-       <div id="loader"></div>
-       <div id="progress"><div id="progress-bar"></div></div>
-       <div id="map">
-           <div id="info"></div>
-       </div>
-       <p>
+    <div class="row map_container">
+      <div class="col-md-8">
+        <div id="loader"></div>
+        <div id="progress">
+          <div id="progress-bar"></div>
+        </div>
+        <div id="map">
+          <div id="info"></div>
+        </div>
+        <p>
          <span class="line">
          <input type="date" id="display_start_date" readonly style="border:0">
          
          <input type="date" id="display_end_date" readonly style="border:0">
          </span>
-       </p>
-       <div id="slider-range"></div>
-     </div>
+        </p>
+        <div id="slider-range"></div>
+      </div>
 
-     <div id="control_panel" class="col-md-4">
-      <div>
-        <h2>Download Controls</h2>
+      <div id="control_panel" class="col-md-4">
+        <div>
+          <h2>Download Controls</h2>
 
-        <span class="line">
+          <span class="line">
         <label for="keyword">Keyword:</label>
         <input type="text" id="keyword" value="coronavirus">
         </span>
-        <br>
+          <br>
 
-        <span class="line">
+          <span class="line">
         <label for="start_date">Data Start Date:</label>
         <input type="date" id="start_date" value="2020-01-01">
         </span>
 
-        <span class="line">
+          <span class="line">
         <label for="end_date">Data End Date:</label>
         <input type="date" id="end_date">
         </span>
 
-        <br>
-        <span class="btn btn-secondary" id="update" onclick="downloadData();">Download Data &raquo;</span>
-        <hr>
-      </div>
+          <br>
+          <span class="btn btn-secondary" id="update" onclick="downloadData();">Download Data &raquo;</span>
+          <hr>
+        </div>
 
-      <div>
-         <h2>View Controls</h2>
-        <span class="line">
+        <div>
+          <h2>View Controls</h2>
+          <span class="line">
             <label for="country_select">View Country:</label>
             <select id="country_select" onchange="setCountryView(this.value)"></select>
         </span>
-        <br>
-        <span class="line">
+          <br>
+          <span class="line">
           <span class="btn btn-secondary" onclick="setMarylandView();">View Maryland</span>
           <span class="btn btn-secondary" onclick="setVirginiaView();">View Virginia</span>
         </span>
-        <hr>
-      </div>
+          <hr>
+        </div>
 
-      <div>
-        <h2>Animation Controls</h2>
+        <div>
+          <h2>Animation Controls</h2>
 
-        <span class="line">
+          <span class="line">
         <label for="animation_start">Animation Start:</label>
         <input type="date" id="animation_start" onchange='setAnimationRange(this.valueAsDate, dataEndDate);'>
         </span>
 
-        <span class="line">
+          <span class="line">
         <label for="animation_end" onchange='setAnimationRange(dataStartDate, this.valueAsDate);'>Animation End:</label>
         <input type="date" id="animation_end">
         </span>
-        <br>
+          <br>
 
-        <span class="line">
+          <span class="line">
         <label for="animate_window">Animation Window:</label>
         <select id="animate_window" onchange="setAnimateWindow(this.value)">
           <option value="1140" selected>Day</option>
@@ -287,18 +294,18 @@
           <option disabled>Custom</option>
         </select>
         </span>
-        <br>
+          <br>
 
-        <span class="line">
+          <span class="line">
 
         <label for="cumulative_animation">Cumulative:</label>
         <input type="radio" name="animation_type" id="cumulative_animation" checked onclick="toggleAnimationType();">
         <label for="daily_rate">Daily Rate:</label>
         <input type="radio" name="animation_type" id="daily_rate" onclick="toggleAnimationType();">
         </span>
-        <br>
+          <br>
 
-        <span class="line">
+          <span class="line">
         <label for="animate_step">Animation Step:</label>
         <select id="animate_step" onchange="setAnimateStep(this.value)">
           <option value="1140" selected>Day</option>
@@ -306,9 +313,9 @@
           <option value="43200">Month</option>
         </select>
         </span>
-        <br>
+          <br>
 
-        <span class="line">
+          <span class="line">
         <label for="animate_speed">Animation Speed:</label>
         <select id="animate_speed" onchange="setAnimateSpeed(this.value)">
           <option value="0">Fast</option>
@@ -316,9 +323,9 @@
           <option value="500">Slow</option>
         </select>
         </span>
-        <br>
+          <br>
 
-        <span class="line">
+          <span class="line">
         <span class="btn btn-secondary" onclick="stepBack();">&lt;</span>
         <span class="btn btn-secondary" id="animate" onclick="animateMarkers();">Start Animation</span>
         <span id="paused" style="display: none;">
@@ -327,81 +334,81 @@
         </span>
         <span class="btn btn-secondary" onclick="stepForward();">&gt;</span>
         </span>
-        <br>
+          <br>
 
-        <hr>
-      </div>
+          <hr>
+        </div>
 
-      <div>
-        <h2> Animation Focus Data </h2>
-        Location: <span id="sidebar_location">N/A</span><br>
-        Confirmed: <span id="sidebar_confirmed">N/A</span><br>
-        Deaths: <span id="sidebar_deaths">N/A</span><br>
-        Recoveries: <span id="sidebar_recoveries">N/A</span><br>
-        Active: <span id="sidebar_active">N/A</span><br>
-        <hr>
-      </div>
+        <div>
+          <h2> Animation Focus Data </h2>
+          Location: <span id="sidebar_location">N/A</span><br>
+          Confirmed: <span id="sidebar_confirmed">N/A</span><br>
+          Deaths: <span id="sidebar_deaths">N/A</span><br>
+          Recoveries: <span id="sidebar_recoveries">N/A</span><br>
+          Active: <span id="sidebar_active">N/A</span><br>
+          <hr>
+        </div>
 
-      <div>
-        <h2> Layer Controls </h2>
-        <label for="news_data_checkbox">
+        <div>
+          <h2> Layer Controls </h2>
+          <label for="news_data_checkbox">
             <div class="circle_news_small">1</div>
             <div class="circle_news_med">10</div>
             <div class="circle_news_large">100</div>
             News Keywords:
-        </label>
-        <input type="checkbox" id="news_data_checkbox" checked onclick="newsLayer.togglePlotting();">
-        <br>
+          </label>
+          <input type="checkbox" id="news_data_checkbox" checked onclick="newsLayer.togglePlotting();">
+          <br>
 
-        <label for="twitter_data_checkbox">
+          <label for="twitter_data_checkbox">
             <div class="circle_twitter_small">1</div>
             <div class="circle_twitter_med">10</div>
             <div class="circle_twitter_large">100</div>
             Tweet Keywords:
-        </label>
-        <input type="checkbox" id="twitter_data_checkbox" onclick="twitterLayer.togglePlotting();">
-        <br>
+          </label>
+          <input type="checkbox" id="twitter_data_checkbox" onclick="twitterLayer.togglePlotting();">
+          <br>
 
 
-        <label for="confirmed_cases_checkbox">
+          <label for="confirmed_cases_checkbox">
             <div class="circle_confirmed_small">1</div>
             <div class="circle_confirmed_med">10</div>
             <div class="circle_confirmed_large">100</div>
             Confirmed Cases:
-        </label>
-        <input type="checkbox" id="confirmed_cases_checkbox" checked onclick="jhuLayer.togglePlotting('confirmed');">
-        <br>
+          </label>
+          <input type="checkbox" id="confirmed_cases_checkbox" checked onclick="jhuLayer.togglePlotting('confirmed');">
+          <br>
 
-        <label for="deaths_checkbox">
+          <label for="deaths_checkbox">
             <div class="circle_deaths_small">1</div>
             <div class="circle_deaths_med">10</div>
             <div class="circle_deaths_large">100</div>
             Deaths:
-        </label>
-        <input type="checkbox" id="deaths_checkbox" checked onclick="jhuLayer.togglePlotting('deaths');">
-        <br>
+          </label>
+          <input type="checkbox" id="deaths_checkbox" checked onclick="jhuLayer.togglePlotting('deaths');">
+          <br>
 
-        <label for="recovered_checkbox">
+          <label for="recovered_checkbox">
             <div class="circle_recovered_small">1</div>
             <div class="circle_recovered_med">10</div>
             <div class="circle_recovered_large">100</div>
             Recoveries:
-        </label>
-        <input type="checkbox" id="recovered_checkbox" onclick="jhuLayer.togglePlotting('recoveries');">
-        <br>
+          </label>
+          <input type="checkbox" id="recovered_checkbox" onclick="jhuLayer.togglePlotting('recoveries');">
+          <br>
 
-        <label for="active_checkbox">
+          <label for="active_checkbox">
             <div class="circle_active_small">1</div>
             <div class="circle_active_med">10</div>
             <div class="circle_active_large">100</div>
             Active Cases:
-        </label>
-        <input type="checkbox" id="active_checkbox" onclick="jhuLayer.togglePlotting('active');">
-        <hr>
+          </label>
+          <input type="checkbox" id="active_checkbox" onclick="jhuLayer.togglePlotting('active');">
+          <hr>
 
+        </div>
       </div>
-     </div>
-   </div>
+    </div>
   </div>
 </main>
 
