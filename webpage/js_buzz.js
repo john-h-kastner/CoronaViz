@@ -184,7 +184,8 @@ info.updateForMarker = function (marker) {
 info.clear();
 
 let animateWindow;
-$("#slider-range").slider({
+const slider_range = $("#slider-range");
+slider_range.slider({
   range: true,
   min: 0,
   max: 100,
@@ -615,11 +616,10 @@ function downloadData() {
     const min = dateToEpochMins(dataStartDate);
     const max = dateToEpochMins(dataEndDate);
 
-    $("#slider-range").slider("option", "min", min);
-    $("#slider-range").slider("option", "max", max);
+    slider_range.slider("option", "min", min);
+    slider_range.slider("option", "max", max);
 
     setDisplayedDateRange(min, min + animateWindow);
-    //setDisplayedDateRange(max - animateWindow - (3 * 24 * 60), max - (3 * 24 * 60));
 
     //Hack because Hanan wants it and I don't care anymore
     selectMarkerByName('Brazil');
@@ -683,7 +683,6 @@ async function terminateAnimation() {
   document.getElementById("paused").style.display = "none";
   document.getElementById("animate").innerHTML = 'Start Animation &raquo;';
   if (dataEndDate) {
-    //setDisplayedDateRange(dateToEpochMins(dataStartDate), dateToEpochMins(dataStartDate)+animateWindow);
     setDisplayedDateRange(dateToEpochMins(dataEndDate) - animateWindow, dateToEpochMins(dataEndDate));
     while (jhuLayer.isTimeWindowEmpty()) {
       console.log('step back', displayEndDate, displayStartDate);
@@ -756,7 +755,7 @@ function setDisplayedDateRange(startMins, endMins) {
   // Set UI controls to reflect these values
   document.getElementById("display_start_date").valueAsDate = epochMinsToDate(startMins);
   document.getElementById("display_end_date").valueAsDate = epochMinsToDate(endMins);
-  $("#slider-range").slider("values", [startMins, endMins]);
+  slider_range.slider("values", [startMins, endMins]);
 
   // Update all layers for new range
   newsLayer.plotData(startMins, endMins);
@@ -835,8 +834,8 @@ function setAnimationRange(start, end) {
   const min = dateToEpochMins(dataStartDate);
   const max = dateToEpochMins(dataEndDate);
 
-  $("#slider-range").slider("option", "min", min);
-  $("#slider-range").slider("option", "max", max);
+  slider_range.slider("option", "min", min);
+  slider_range.slider("option", "max", max);
 
   setDisplayedDateRange(min, min + animateWindow);
 }
