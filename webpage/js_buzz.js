@@ -1,7 +1,7 @@
 const map = L.map('map', {'worldCopyJump': true});
 
 // Set Default view to South America as requested by Hanan
-south_america_bb = [[5.44, -73.83], [-34.67, -34.98]];
+const south_america_bb = [[5.44, -73.83], [-34.67, -34.98]];
 map.fitBounds(south_america_bb);
 
 const jhuLayer = new JHUDataLayer(confirmedCasesSelected, deathsSelected, recoveredSelected, activeSelected);
@@ -138,7 +138,7 @@ function updateSidebarInfo(confirmed, deaths, recoveries, active, placenames) {
   document.getElementById("sidebar_location").innerHTML = placenames;
 }
 
-function updateSidebarForMarker(marker) {
+function getMarkerStatistic(marker) {
   let confirmed, deaths, recoveries, active, names;
   if (marker.getAllChildMarkers) {
     confirmed = marker.getAllChildMarkers().reduce((a, v) => a + v.confirmed, 0);
@@ -153,8 +153,12 @@ function updateSidebarForMarker(marker) {
     active = marker.active;
     names = marker.name;
   }
-  updateSidebarInfo(confirmed, deaths, recoveries, active, names);
+  return [confirmed, deaths, recoveries, active, names];
+}
 
+function updateSidebarForMarker(marker) {
+  const [confirmed, deaths, recoveries, active, names] = getMarkerStatistic(marker);
+  updateSidebarInfo(confirmed, deaths, recoveries, active, names);
   sidebar_selected_marker = marker;
 }
 
@@ -167,25 +171,9 @@ info.updateForMarker = function (marker) {
     selected_marker._icon.classList.remove('selected');
   }
 
-  let confirmed, deaths, recoveries, active, names;
-  if (marker.getAllChildMarkers) {
-    confirmed = marker.getAllChildMarkers().reduce((a, v) => a + v.confirmed, 0);
-    deaths = marker.getAllChildMarkers().reduce((a, v) => a + v.deaths, 0);
-    recoveries = marker.getAllChildMarkers().reduce((a, v) => a + v.recoveries, 0);
-    active = marker.getAllChildMarkers().reduce((a, v) => a + v.active, 0);
-    names = marker.getAllChildMarkers().slice().filter((e) => e.confirmed > 0).sort((a, b) => a.confirmed - b.confirmed).reverse().map((v) => v.name);
-    if (marker._icon) {
-      marker._icon.classList.add('selected');
-    }
-  } else {
-    confirmed = marker.confirmed;
-    deaths = marker.deaths;
-    recoveries = marker.recoveries;
-    active = marker.active;
-    names = marker.name;
-    if (marker._icon) {
-      marker._icon.classList.add('selected');
-    }
+  const [confirmed, deaths, recoveries, active, names] = getMarkerStatistic(marker);
+  if (marker._icon) {
+    marker._icon.classList.add('selected');
   }
   info.update(confirmed, deaths, recoveries, active, names);
 
