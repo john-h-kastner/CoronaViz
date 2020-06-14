@@ -222,11 +222,8 @@
           <div id="info"></div>
         </div>
         <p>
-         <span class="line">
          <input type="date" id="display_start_date" readonly style="border:0">
-         
          <input type="date" id="display_end_date" readonly style="border:0">
-         </span>
         </p>
         <div id="slider-range"></div>
       </div>
@@ -235,21 +232,15 @@
         <div>
           <h2>Download Controls</h2>
 
-          <span class="line">
         <label for="keyword">Keyword:</label>
         <input type="text" id="keyword" value="coronavirus">
-        </span>
           <br>
 
-          <span class="line">
         <label for="start_date">Data Start Date:</label>
         <input type="date" id="start_date" value="2020-01-01">
-        </span>
 
-          <span class="line">
         <label for="end_date">Data End Date:</label>
         <input type="date" id="end_date">
-        </span>
 
           <br>
           <span class="btn btn-secondary" id="update" onclick="downloadData();">Download Data &raquo;</span>
@@ -258,33 +249,24 @@
 
         <div>
           <h2>View Controls</h2>
-          <span class="line">
-            <label for="country_select">View Country:</label>
-            <select id="country_select" onchange="setCountryView(this.value)"></select>
-        </span>
+          <label for="country_select">View Country:</label>
+          <select id="country_select" onchange="setCountryView(this.value)"></select>
           <br>
-          <span class="line">
           <span class="btn btn-secondary" onclick="setMarylandView();">View Maryland</span>
           <span class="btn btn-secondary" onclick="setVirginiaView();">View Virginia</span>
-        </span>
           <hr>
         </div>
 
         <div>
           <h2>Animation Controls</h2>
 
-          <span class="line">
         <label for="animation_start">Animation Start:</label>
         <input type="date" id="animation_start" onchange='setAnimationRange(this.valueAsDate, dataEndDate);'>
-        </span>
 
-          <span class="line">
         <label for="animation_end" onchange='setAnimationRange(dataStartDate, this.valueAsDate);'>Animation End:</label>
         <input type="date" id="animation_end">
-        </span>
           <br>
 
-          <span class="line">
         <label for="animate_window">Animation Window:</label>
         <select id="animate_window" onchange="setAnimateWindow(this.value)">
           <option value="1140" selected>Day</option>
@@ -293,39 +275,30 @@
           <option value="max">Maximum</option>
           <option disabled>Custom</option>
         </select>
-        </span>
           <br>
-
-          <span class="line">
 
         <label for="cumulative_animation">Cumulative:</label>
         <input type="radio" name="animation_type" id="cumulative_animation" checked onclick="toggleAnimationType();">
         <label for="daily_rate">Daily Rate:</label>
         <input type="radio" name="animation_type" id="daily_rate" onclick="toggleAnimationType();">
-        </span>
           <br>
 
-          <span class="line">
         <label for="animate_step">Animation Step:</label>
         <select id="animate_step" onchange="setAnimateStep(this.value)">
           <option value="1140" selected>Day</option>
           <option value="10080">Week</option>
           <option value="43200">Month</option>
         </select>
-        </span>
           <br>
 
-          <span class="line">
         <label for="animate_speed">Animation Speed:</label>
         <select id="animate_speed" onchange="setAnimateSpeed(this.value)">
           <option value="0">Fast</option>
           <option value="100" selected>Normal</option>
           <option value="500">Slow</option>
         </select>
-        </span>
           <br>
 
-          <span class="line">
         <span class="btn btn-secondary" onclick="stepBack();">&lt;</span>
         <span class="btn btn-secondary" id="animate" onclick="animateMarkers();">Start Animation</span>
         <span id="paused" style="display: none;">
@@ -333,7 +306,6 @@
           <span class="btn btn-secondary" id="stop" onclick="terminateAnimation();">Stop</span>
         </span>
         <span class="btn btn-secondary" onclick="stepForward();">&gt;</span>
-        </span>
           <br>
 
           <hr>
