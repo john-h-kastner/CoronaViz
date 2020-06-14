@@ -40,8 +40,21 @@ map.on('zoomend', function (e) {
 
 map.on('mousemove', function (e) {
   if (info._div) {
-    info._div.style.left = Math.round(e.containerPoint.x) + "px";
-    info._div.style.top = Math.round(e.containerPoint.y) + "px";
+    const left = Math.round(e.containerPoint.x);
+    const top = Math.round(e.containerPoint.y);
+
+    info._div.style.left = left + "px";
+    info._div.style.top = top + "px";
+
+    const info_bounds = info._div.getBoundingClientRect();
+    const map_bounds = document.getElementById('map').getBoundingClientRect();
+
+    if(info_bounds.right > map_bounds.right) {
+      info._div.style.left = (left - (info_bounds.right - map_bounds.right)) + "px";
+    }
+    if(info_bounds.bottom > map_bounds.bottom) {
+      info._div.style.top = (top - (info_bounds.bottom - map_bounds.bottom)) + "px";
+    }
   }
 
   info.updateForMarker(getClosestMarker(e.latlng));
