@@ -60,9 +60,25 @@ map.on('mousemove', function (e) {
   info.updateForMarker(getClosestMarker(e.latlng));
 });
 
-map.on('mousedown', function (e) {
-  updateSidebarForMarker(getClosestMarker(e.latlng));
-});
+map.on('click', updateSidebarForEvent);
+map.on('dblclick', resetClickTimeout);
+
+// Hack so that sidebar is not set of double clicks
+map.clicked = 0;
+function updateSidebarForEvent(e) {
+  map.clicked = 1;
+  setTimeout(function (){
+    if(map.clicked === 1) {
+      updateSidebarForMarker(getClosestMarker(e.latlng));
+      map.clicked = 0;
+    }
+  }, 250);
+}
+
+function resetClickTimeout() {
+  map.clicked = 0;
+}
+
 
 
 function getClosestMarker(latlng) {
@@ -408,6 +424,10 @@ class JHUDataLayer {
         return that.layerIcon(confirmed, deaths, recoveries, active);
       }
     });
+    this.markers.on('click',updateSidebarForEvent);
+    this.markers.on('clusterclick',updateSidebarForEvent);
+    this.markers.on('dblclick',resetClickTimeout);
+    this.markers.on('clusterdblclick',resetClickTimeout);
 
     this.timeSeriesMarkers = this.timeSeries.map(function (p) {
       const marker = L.marker([p.lat, p.lng]);
