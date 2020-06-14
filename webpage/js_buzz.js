@@ -38,25 +38,32 @@ map.on('zoomend', function (e) {
   info.clear();
 });
 
+let floating_box = document.getElementById("float_toggle").checked;
 map.on('mousemove', function (e) {
-  if (info._div) {
-    const left = Math.round(e.containerPoint.x);
-    const top = Math.round(e.containerPoint.y);
+  const map_bounds = document.getElementById('map').getBoundingClientRect();
+  let info_bouds;
+  if (floating_box) { 
+    if (info._div) {
+      const left = Math.round(e.containerPoint.x);
+      const top = Math.round(e.containerPoint.y);
 
-    info._div.style.left = left + "px";
-    info._div.style.top = top + "px";
+      info._div.style.left = left + "px";
+      info._div.style.top = top + "px";
 
-    const info_bounds = info._div.getBoundingClientRect();
-    const map_bounds = document.getElementById('map').getBoundingClientRect();
+      info_bounds = info._div.getBoundingClientRect();
 
-    if(info_bounds.right > map_bounds.right) {
-      info._div.style.left = (left - (info_bounds.right - map_bounds.right)) + "px";
+      if(info_bounds.right > map_bounds.right) {
+        info._div.style.left = (left - (info_bounds.right - map_bounds.right)) + "px";
+      }
+      if(info_bounds.bottom > map_bounds.bottom) {
+        info._div.style.top = (top - (info_bounds.bottom - map_bounds.bottom)) + "px";
+      }
     }
-    if(info_bounds.bottom > map_bounds.bottom) {
-      info._div.style.top = (top - (info_bounds.bottom - map_bounds.bottom)) + "px";
-    }
+  } else {
+      info_bounds = info._div.getBoundingClientRect();
+      info._div.style.left = (map_bounds.right - 125) + "px";
+      info._div.style.top = "0px";
   }
-
   info.updateForMarker(getClosestMarker(e.latlng));
 });
 
@@ -871,4 +878,8 @@ function setAnimationRange(start, end) {
   slider_range.slider("option", "max", max);
 
   setDisplayedDateRange(min, min + animateWindow);
+}
+
+function toggleFloatingBox() {
+  floating_box = !floating_box;
 }
