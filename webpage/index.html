@@ -236,10 +236,8 @@
         <input type="text" id="keyword" value="coronavirus">
           <br>
 
-        <label for="start_date">Data Start Date:</label>
+        Data Range:
         <input type="date" id="start_date" value="2020-01-01">
-
-        <label for="end_date">Data End Date:</label>
         <input type="date" id="end_date">
 
           <br>
@@ -263,11 +261,9 @@
         <div>
           <h2>Animation Controls</h2>
 
-        <label for="animation_start">Animation Start:</label>
+        Animation Range: 
         <input type="date" id="animation_start" onchange='setAnimationRange(this.valueAsDate, dataEndDate);'>
-
-        <label for="animation_end" onchange='setAnimationRange(dataStartDate, this.valueAsDate);'>Animation End:</label>
-        <input type="date" id="animation_end">
+        <input type="date" id="animation_end" onchange='setAnimationRange(dataStartDate, this.valueAsDate);'>
           <br>
 
         <label for="animate_window">Animation Window:</label>
