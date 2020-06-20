@@ -14,6 +14,11 @@ def convert_row(row_dict):
   lat = row_dict["Lat"]
   lng = row_dict["Long"]
 
+  # The us CSV has some entries  with 0,0 coordinates.
+  # Ignore these
+  if float(lat) == 0 and float(lng) == 0:
+    return None
+
   row_dict.pop("Province/State", None)
   row_dict.pop("Country/Region", None)
   row_dict.pop("Lat", None)
