@@ -113,6 +113,10 @@ span.line {
   }
 }
 
+.selected .circle {
+    border-width: 5px !important;
+}
+
 #info {
   padding: 6px 8px;
   font: 14px/16px Arial, Helvetica, sans-serif;
