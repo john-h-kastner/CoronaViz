@@ -39,6 +39,8 @@ map.on('zoomend', function (e) {
 });
 
 let floating_box = document.getElementById("float_toggle").checked;
+// weird hack becuase on click isn't working
+let last_latlng = undefined;
 map.on('mousemove', function (e) {
   const map_bounds = document.getElementById('map').getBoundingClientRect();
   let info_bouds;
@@ -64,6 +66,7 @@ map.on('mousemove', function (e) {
       info._div.style.left = (map_bounds.right - 125) + "px";
       info._div.style.top = "0px";
   }
+  last_latlng = e.latlng;
   info.updateForMarker(getClosestMarker(e.latlng));
 });
 
@@ -76,7 +79,9 @@ function updateSidebarForEvent(e) {
   map.clicked = 1;
   setTimeout(function (){
     if(map.clicked === 1) {
-      updateSidebarForMarker(getClosestMarker(e.latlng));
+      if (last_latlng) {
+        updateSidebarForMarker(getClosestMarker(last_latlng));
+      }
       map.clicked = 0;
     }
   }, 250);
