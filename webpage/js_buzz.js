@@ -219,25 +219,6 @@ info.updateForMarker = function (marker) {
 
 info.clear();
 
-let animateWindow;
-const slider_range = $("#slider-range");
-slider_range.slider({
-  range: true,
-  min: 0,
-  max: 100,
-  values: [0, 100],
-  slide: function (event, ui) {
-    const displayStartMins = ui.values[0];
-    const displayEndMins = ui.values[1];
-
-    setDisplayedDateRange(displayStartMins, displayEndMins);
-
-    animateWindow = displayEndMins - displayStartMins;
-
-    document.getElementById('animate_window').value = 'Custom';
-  }
-});
-
 const country_select = document.getElementById("country_select");
 const sorted_options = Object.entries(bounding_boxes).sort(function (a, b) {
   return a[1][0].localeCompare(b[1][0])
@@ -260,11 +241,30 @@ let dataEndDate;
 let displayStartDate;
 let displayEndDate;
 
-animateWindow = 24 * 60;
+let animateWindow = 24*60 * parseInt(document.getElementById('animate_window').value);
 let animateStep = 24 * 60;
 let animateSpeed = 100;
 let dailyRate = document.getElementById("daily_rate").checked;
 let animation_paused = false;
+
+const slider_range = $("#slider-range");
+slider_range.slider({
+  range: true,
+  min: 0,
+  max: 100,
+  values: [0, animateWindow],
+  slide: function (event, ui) {
+    const displayStartMins = ui.values[0];
+    const displayEndMins = ui.values[1];
+
+    setDisplayedDateRange(displayStartMins, displayEndMins);
+
+    animateWindow = displayEndMins - displayStartMins;
+
+    document.getElementById('animate_window').value = Math.floor((displayEndMins - displayStartMins)/(60*24));
+  }
+});
+
 
 selected_marker = undefined;
 sidebar_selected_marker = undefined;
@@ -725,7 +725,6 @@ async function terminateAnimation() {
   if (dataEndDate) {
     setDisplayedDateRange(dateToEpochMins(dataEndDate) - animateWindow, dateToEpochMins(dataEndDate));
     while (jhuLayer.isTimeWindowEmpty()) {
-      console.log('step back', displayEndDate, displayStartDate);
       stepBack();
       await new Promise(r => setTimeout(r, animateSpeed));
     }
@@ -774,17 +773,9 @@ function updateProgressBar(processed, total, elapsed, layersArray) {
 }
 
 function setAnimateWindow(size) {
-  let startDate;
-  let endDate;
-  if (size === "max") {
-    startDate = dateToEpochMins(document.getElementById("start_date").valueAsDate);
-    endDate = dateToEpochMins(document.getElementById("end_date").valueAsDate);
-    animateWindow = endDate - startDate;
-  } else {
-    animateWindow = parseInt(size);
-    startDate = displayStartDate;
-    endDate = startDate + animateWindow;
-  }
+  animateWindow = 24 * 60 * parseInt(size);
+  const startDate = displayStartDate;
+  const endDate = startDate + animateWindow;
   setDisplayedDateRange(startDate, endDate);
 }
 
