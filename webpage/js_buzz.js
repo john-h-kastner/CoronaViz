@@ -251,6 +251,12 @@ let animateStep = 24 * 60;
 let animateSpeed = 100;
 let dailyRate = document.getElementById("daily_rate").checked;
 let animation_paused = false;
+let tempAnimateWindow = 7 * 60 * 24;
+let animate_window_max = document.getElementById("animate_max").checked
+if(animate_window_max) {
+  tempAnimateWindow = animateWindow;
+  document.getElementById('animate_window').disabled = true;
+}
 
 const slider_range = $("#slider-range");
 slider_range.slider({
@@ -665,6 +671,10 @@ function downloadData() {
     slider_range.slider("option", "min", min);
     slider_range.slider("option", "max", max);
 
+    if(animate_window_max) {
+      animateWindow = max - min;
+    }
+
     setDisplayedDateRange(min, min + animateWindow);
 
     //Hack because Hanan wants it and I don't care anymore
@@ -777,11 +787,27 @@ function updateProgressBar(processed, total, elapsed, layersArray) {
   }
 }
 
+function setAnimateWindowFromInput(size) {
+  setAnimateWindow(24*60*parseInt(size));
+}
+
 function setAnimateWindow(size) {
-  animateWindow = 24 * 60 * parseInt(size);
+  animateWindow = size;
   const startDate = displayStartDate;
   const endDate = startDate + animateWindow;
   setDisplayedDateRange(startDate, endDate);
+}
+
+function toggleAnimateMax() {
+  animate_window_max = !animate_window_max;
+  if (animate_window_max) {
+    document.getElementById('animate_window').disabled = true;
+    tempAnimateWindow = animateWindow;
+    setAnimateWindow(dateToEpochMins(dataEndDate) - dateToEpochMins(dataStartDate));
+  } else {
+    document.getElementById('animate_window').disabled = false;
+    setAnimateWindow(tempAnimateWindow);
+  }
 }
 
 function setDisplayedDateRange(startMins, endMins) {

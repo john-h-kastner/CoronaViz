@@ -267,7 +267,10 @@
           <br>
 
         <label for="animate_window">Animation Window:</label>
-        <input style="width: 25%;" value="7" type="number" id="animate_window" onchange="setAnimateWindow(this.value)" min="1"> days
+        <input style="width: 25%;" value="7" type="number" id="animate_window" onchange="setAnimateWindowFromInput(this.value)" min="1"> days
+          <br>
+        <label for="animate_max">Maximum Windows:</label>
+        <input type="checkbox" id="animate_max" onclick="toggleAnimateMax()">
           <br>
 
         <label for="cumulative_animation">Cumulative:</label>
