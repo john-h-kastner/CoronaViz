@@ -251,6 +251,7 @@ let animateStep = 24 * 60;
 let animateSpeed = 100;
 let dailyRate = document.getElementById("daily_rate").checked;
 let animation_paused = false;
+let log_scale = document.getElementById("log").checked;
 let tempAnimateWindow = 7 * 60 * 24;
 let animate_window_max = document.getElementById("animate_max").checked
 if(animate_window_max) {
@@ -755,12 +756,22 @@ function normalizeCount(clusterSize) {
 }
 
 function markerSize(clusterSize) {
-  clusterSize = normalizeCount(clusterSize);
-  if (clusterSize < 0) {
-    return 0;
+  clusterSize = clusterSize;//normalizeCount(clusterSize);
+  if(log_scale) {
+    if (clusterSize <= 0) {
+      return 0;
+    } else {
+      return 40 + Math.log(2 * clusterSize) ** 2;
+    }
   } else {
-    return 40 + Math.log(2 * clusterSize) ** 2;
+    const max_size = 250;
+    return Math.min(max_size, clusterSize/2000);
   }
+}
+
+function setLogScale(logScale) {
+  log_scale = logScale;
+  setDisplayedDateRange(displayStartDate, displayEndDate);
 }
 
 function dateToEpochMins(date) {
