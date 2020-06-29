@@ -764,8 +764,11 @@ function markerSize(clusterSize) {
       return 40 + Math.log(2 * clusterSize) ** 2;
     }
   } else {
-    const max_size = 250;
-    return Math.min(max_size, clusterSize/2000);
+    const max_daily = 50000;
+    const max_range = max_daily * (animateWindow / (60 * 24));
+
+    const max_size = 1000;
+    return max_size * (clusterSize / max_range);
   }
 }
 
