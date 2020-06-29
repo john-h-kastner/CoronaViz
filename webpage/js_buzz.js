@@ -859,8 +859,8 @@ function setAnimateSpeed(speed) {
   animateSpeed = parseInt(speed);
 }
 
-function toggleAnimationType() {
-  dailyRate = !dailyRate;
+function setAnimationType(type) {
+  dailyRate = type;
   if (selected_marker) {
     info.updateForMarker(selected_marker);
   }
