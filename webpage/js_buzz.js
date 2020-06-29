@@ -538,7 +538,7 @@ class JHUDataLayer {
   }
 
   layerIcon(confirmed, deaths, recovered, active) {
-    const confirmedSize = markerSize(confirmed);
+    const confirmedSize = markerSize(confirmed, true);
     let confirmedStyle =
         'position: relative;' +
         'font-weight: bolder;' +
@@ -755,7 +755,7 @@ function normalizeCount(clusterSize) {
   }
 }
 
-function markerSize(clusterSize) {
+function markerSize(clusterSize, confirmed=false) {
   clusterSize = clusterSize;//normalizeCount(clusterSize);
   if(log_scale) {
     if (clusterSize <= 0) {
@@ -764,11 +764,17 @@ function markerSize(clusterSize) {
       return 40 + Math.log(2 * clusterSize) ** 2;
     }
   } else {
-    const max_daily = 50000;
+    let max_daily;
+    if(confirmed){
+      max_daily = 50000;
+    } else {
+      max_daily = 10000;
+    }
+
     const max_range = max_daily * (animateWindow / (60 * 24));
 
     const max_size = 1000;
-    return max_size * (clusterSize / max_range);
+    return 10 + max_size * (clusterSize / max_range);
   }
 }
 
