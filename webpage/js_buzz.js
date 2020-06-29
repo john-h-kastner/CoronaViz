@@ -813,8 +813,13 @@ function toggleAnimateMax() {
   animate_window_max = !animate_window_max;
   if (animate_window_max) {
     document.getElementById('animate_window').disabled = true;
-    tempAnimateWindow = animateWindow;
-    setAnimateWindow(dateToEpochMins(dataEndDate) - dateToEpochMins(dataStartDate));
+    tmpAnimateWindow = animateWindow;
+    const startDate = dateToEpochMins(document.getElementById("start_date").valueAsDate);
+    const endDate = dateToEpochMins(document.getElementById("end_date").valueAsDate);
+    animateWindow = endDate - startDate;
+    setDisplayedDateRange(startDate, endDate);
+    //displayStartDate = dataStartDate;
+    //setAnimateWindow(dateToEpochMins(dataEndDate) - dateToEpochMins(dataStartDate));
   } else {
     document.getElementById('animate_window').disabled = false;
     setAnimateWindow(tempAnimateWindow);
