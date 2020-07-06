@@ -285,6 +285,13 @@
         <input type="radio" name="animation_type" id="daily_rate" onclick="setAnimationType(true);">
           <br>
 
+        <label for="window_animation">Window:</label>
+        <input type="radio" name="window_type" id="window_animation" checked onclick="setTotalAnimation(false);">
+        <label for="total_animation">Total:</label>
+        <input type="radio" name="window_type" id="total_animation" onclick="setTotalAnimation(true);">
+          <br>
+
+
         <label for="animate_step">Animation Step:</label>
         <select id="animate_step" onchange="setAnimateStep(this.value)">
           <option value="1140" selected>Day</option>

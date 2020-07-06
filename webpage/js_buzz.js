@@ -258,6 +258,11 @@ if(animate_window_max) {
   tempAnimateWindow = animateWindow;
   document.getElementById('animate_window').disabled = true;
 }
+let totalAnimation = document.getElementById("total_animation").checked;
+if(totalAnimation) {
+  document.getElementById('animate_window').disabled = true;
+}
+
 
 const slider_range = $("#slider-range");
 slider_range.slider({
@@ -822,9 +827,9 @@ function toggleAnimateMax() {
   animate_window_max = !animate_window_max;
   if (animate_window_max) {
     document.getElementById('animate_window').disabled = true;
-    tmpAnimateWindow = animateWindow;
-    const startDate = dateToEpochMins(document.getElementById("start_date").valueAsDate);
-    const endDate = dateToEpochMins(document.getElementById("end_date").valueAsDate);
+    tempAnimateWindow = animateWindow;
+    const startDate = dateToEpochMins(dataStartDate);
+    const endDate = dateToEpochMins(dataEndDate);
     animateWindow = endDate - startDate;
     setDisplayedDateRange(startDate, endDate);
     //displayStartDate = dataStartDate;
@@ -880,7 +885,9 @@ function stepForward() {
   let current_end = displayEndDate;
   current_end += animateStep;
   let current_start = displayStartDate;
-  current_start += animateStep;
+  if(!totalAnimation){
+    current_start += animateStep;
+  }
   if (current_end <= dateToEpochMins(dataEndDate)) {
     setDisplayedDateRange(current_start, current_end);
     return true;
@@ -929,4 +936,14 @@ function setAnimationRange(start, end) {
 
 function toggleFloatingBox() {
   floating_box = !floating_box;
+}
+
+function setTotalAnimation(total) {
+  totalAnimation = total;
+  document.getElementById('animate_window').disabled = totalAnimation;
+  if(!totalAnimation) {
+    setDisplayedDateRange(displayEndDate - animateWindow, displayEndDate);
+  } else {
+    setDisplayedDateRange(dateToEpochMins(dataStartDate), displayEndDate);
+  }
 }
