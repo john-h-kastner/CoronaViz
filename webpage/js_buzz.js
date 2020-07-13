@@ -776,7 +776,14 @@ function markerSize(clusterSize, confirmed=false) {
       max_daily = 10000;
     }
 
-    const max_range = max_daily * (animateWindow / (60 * 24));
+    let windowSize = 0;
+    if (totalAnimation) {
+        windowSize = displayEndDate - displayStartDate;
+    } else {
+        windowSize = animateWindow;
+    }
+
+    const max_range = max_daily * (windowSize / (60 * 24));
 
     const max_size = 1000;
     return 10 + max_size * (clusterSize / max_range);
