@@ -7,6 +7,7 @@ const south_america_bb = [[5.44, -73.83], [-34.67, -34.98]];
 map.fitBounds(south_america_bb);
 
 function selectMarkerByName(name) {
+  console.log(name);
   if (jhuLayer && jhuLayer.markers._gridClusters) {
     const gridClustered = jhuLayer.markers._gridClusters[map.getZoom()];
     const gridUnclustered = jhuLayer.markers._gridUnclustered[map.getZoom()];
@@ -914,6 +915,8 @@ function stepBack() {
 function setCountryView(country_code) {
   const bb = bounding_boxes[country_code][1];
   map.fitBounds([[bb[1], bb[0]], [bb[3], bb[2]]]);
+  const name = sorted_options.find(e => e[0] == country_code)[1][0];
+  selectMarkerByName(name);
 }
 
 function setMarylandView() {
