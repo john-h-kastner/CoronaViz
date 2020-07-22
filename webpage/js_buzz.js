@@ -745,7 +745,11 @@ async function terminateAnimation() {
   document.getElementById("paused").style.display = "none";
   document.getElementById("animate").innerHTML = 'Start Animation &raquo;';
   if (dataEndDate) {
-    setDisplayedDateRange(dateToEpochMins(dataEndDate) - animateWindow, dateToEpochMins(dataEndDate));
+    if(!totalAnimation) {
+      setDisplayedDateRange(dateToEpochMins(dataEndDate) - animateWindow, dateToEpochMins(dataEndDate));
+    } else {
+      setDisplayedDateRange(dateToEpochMins(dataStartDate), dateToEpochMins(dataEndDate));
+    }
     while (jhuLayer.isTimeWindowEmpty()) {
       stepBack();
       await new Promise(r => setTimeout(r, animateSpeed));
@@ -909,7 +913,11 @@ function stepBack() {
   current_end -= animateStep;
   let current_start = displayStartDate;
   current_start -= animateStep;
-  setDisplayedDateRange(current_start, current_end);
+  if(!totalAnimation) {
+    setDisplayedDateRange(current_start, current_end);
+  } else {
+    setDisplayedDateRange(displayStartDate, current_end);
+  }
 }
 
 function setCountryView(country_code) {
